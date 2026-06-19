@@ -4,12 +4,13 @@ import CalendarButton from "../Shared/CalendarButton";
 import Section from "../Shared/Section";
 import GoogleMapsButton from "../features/GoogleMapsButton";
 import Heading from "../ui/Heading";
+import { content } from "../../data/content";
 import { wedding } from "../../data/wedding";
 
 export default function Hero() {
   const [hasScrolled, setHasScrolled] = useState(false);
   const [showScrollIndicator, setShowScrollIndicator] = useState(false);
-  const ceremonyDate = wedding.ceremony.date || "Date to be announced";
+  const ceremonyDate = wedding.ceremony.date || content.hero.detailsComingSoon;
   const coupleNames = `${wedding.couple.partner1} & ${wedding.couple.partner2}`;
 
   useEffect(() => {
@@ -42,7 +43,7 @@ export default function Hero() {
           </div>
 
           <div className="mt-8">
-            <Heading title="Vi siger ja" subtitle="COPENHAGEN · DENMARK" />
+            <Heading title={content.hero.title} subtitle={content.hero.country} />
           </div>
 
           <div className="mt-5 text-sm font-light text-stone-500 sm:text-lg">
