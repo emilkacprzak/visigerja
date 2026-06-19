@@ -5,6 +5,8 @@ interface ButtonProps {
   href?: string;
   disabled?: boolean;
   onClick?: () => void;
+  rel?: string;
+  target?: string;
   variant?: "primary" | "secondary";
 }
 
@@ -13,6 +15,8 @@ export default function Button({
   href,
   disabled = false,
   onClick,
+  rel,
+  target,
   variant = "primary",
 }: ButtonProps) {
   const baseClass =
@@ -26,7 +30,7 @@ export default function Button({
 
   if (href) {
     return (
-      <a href={href} className={className}>
+      <a href={href} target={target} rel={rel} className={className}>
         {children}
       </a>
     );

@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import Bears from "./Bears";
-import Button from "../Shared/Button";
 import CalendarButton from "../Shared/CalendarButton";
 import Section from "../Shared/Section";
+import GoogleMapsButton from "../features/GoogleMapsButton";
 import Heading from "../ui/Heading";
 import { wedding } from "../../data/wedding";
 
@@ -55,13 +55,7 @@ export default function Hero() {
           </div>
 
           <div className="mt-5 flex w-full max-w-xs flex-col items-center justify-center gap-3 sm:mt-6 sm:max-w-none sm:flex-row sm:flex-wrap sm:gap-4">
-            <Button
-              variant="primary"
-              href={wedding.ceremony.mapsUrl || undefined}
-              disabled={!wedding.ceremony.mapsUrl}
-            >
-              Open Maps
-            </Button>
+            <GoogleMapsButton />
 
             <CalendarButton />
           </div>

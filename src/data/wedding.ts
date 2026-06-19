@@ -11,7 +11,7 @@ export const wedding = {
     time: "",
     venue: "Copenhagen City Hall",
     address: "",
-    mapsUrl: "",
+    mapsUrl: "https://maps.google.com/?q=Copenhagen+City+Hall",
   },
 
   photos: {
