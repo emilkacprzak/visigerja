@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Hotel, Plane } from "lucide-react";
 import hotelSleepEasterEgg from "../../assets/illustrations/bears-hotel-sleep-easter-egg.webp";
 import planeEasterEgg from "../../assets/illustrations/bears-plane-easter-egg.webp";
+import travelEasterEgg from "../../assets/illustrations/bears-travel-easter-egg.webp";
 import { playAirplaneTakeoff } from "../../lib/sounds";
 import Button from "../Shared/Button";
 import Section from "../Shared/Section";
@@ -24,13 +25,19 @@ const cards = [
 ];
 
 export default function Travel() {
+  const travelTapTimes = useRef<number[]>([]);
   const tapTimes = useRef<number[]>([]);
+  const hasTravelPlayed = useRef(false);
   const hasPlayed = useRef(false);
   const hotelTapTimes = useRef<number[]>([]);
   const hasHotelPlayed = useRef(false);
+  const travelAudio = useRef<HTMLAudioElement | undefined>(undefined);
+  const travelSecretTimers = useRef<number[]>([]);
   const snoringAudio = useRef<HTMLAudioElement | undefined>(undefined);
   const snoringFadeTimer = useRef<number | undefined>(undefined);
   const [showPlane, setShowPlane] = useState(false);
+  const [showTravelSecret, setShowTravelSecret] = useState(false);
+  const [isTravelSecretLeaving, setIsTravelSecretLeaving] = useState(false);
   const [showHotelSleep, setShowHotelSleep] = useState(false);
   const [isHotelSleepLeaving, setIsHotelSleepLeaving] = useState(false);
 
@@ -68,25 +75,25 @@ export default function Travel() {
       return;
     }
 
-    const audio = new Audio("/audio/bears-snoring-web.mp3");
+    const audioUrl = `${import.meta.env.BASE_URL}audio/bears-snoring-web.mp3`;
+    const audio = new Audio(audioUrl);
 
     audio.preload = "auto";
-    audio.volume = 0;
+    audio.volume = 0.01;
     audio.loop = true;
     snoringAudio.current = audio;
 
-    window.requestAnimationFrame(() => {
-      void audio
-        .play()
-        .then(() => {
-          fadeSnoringVolume(audio, 0.65, 300);
-        })
-        .catch(() => {
-          audio.pause();
-          audio.currentTime = 0;
-          snoringAudio.current = undefined;
-        });
-    });
+    void audio
+      .play()
+      .then(() => {
+        fadeSnoringVolume(audio, 0.8, 300);
+      })
+      .catch((error) => {
+        console.warn("Snoring audio blocked:", error);
+        audio.pause();
+        audio.currentTime = 0;
+        snoringAudio.current = undefined;
+      });
   };
 
   const stopSnoring = () => {
@@ -105,6 +112,8 @@ export default function Travel() {
 
   useEffect(() => {
     return () => {
+      travelSecretTimers.current.forEach((timer) => window.clearTimeout(timer));
+      travelSecretTimers.current = [];
       clearSnoringFade();
 
       if (snoringAudio.current) {
@@ -112,8 +121,70 @@ export default function Travel() {
         snoringAudio.current.currentTime = 0;
         snoringAudio.current = undefined;
       }
+
+      if (travelAudio.current) {
+        travelAudio.current.pause();
+        travelAudio.current.currentTime = 0;
+        travelAudio.current = undefined;
+      }
     };
   }, []);
+
+  const handleTravelTitleTap = async () => {
+    if (hasTravelPlayed.current) {
+      return;
+    }
+
+    const now = Date.now();
+    travelTapTimes.current = [...travelTapTimes.current, now].filter(
+      (tapTime) => now - tapTime <= 3000,
+    );
+
+    if (travelTapTimes.current.length >= 3) {
+      hasTravelPlayed.current = true;
+      travelTapTimes.current = [];
+
+      const audio = new Audio(
+        `${import.meta.env.BASE_URL}audio/travel-plane-web.mp3`,
+      );
+
+      audio.preload = "auto";
+      audio.volume = 0.8;
+      travelAudio.current = audio;
+
+      try {
+        await audio.play();
+      } catch (error) {
+        console.warn("Travel audio blocked:", error);
+      }
+
+      travelSecretTimers.current.push(
+        window.setTimeout(() => {
+          setShowTravelSecret(true);
+        }, 300),
+      );
+
+      travelSecretTimers.current.push(
+        window.setTimeout(() => {
+          setIsTravelSecretLeaving(true);
+        }, 10300),
+      );
+
+      travelSecretTimers.current.push(
+        window.setTimeout(() => {
+          audio.pause();
+          audio.currentTime = 0;
+
+          if (travelAudio.current === audio) {
+            travelAudio.current = undefined;
+          }
+
+          setShowTravelSecret(false);
+          setIsTravelSecretLeaving(false);
+        }, 10700),
+      );
+    }
+  };
 
   const handleTitleTap = () => {
     if (hasPlayed.current) {
@@ -148,8 +219,8 @@ export default function Travel() {
 
     if (hotelTapTimes.current.length >= 3) {
       hasHotelPlayed.current = true;
-      setShowHotelSleep(true);
       startSnoring();
+      setShowHotelSleep(true);
       window.setTimeout(() => {
         setIsHotelSleepLeaving(true);
         stopSnoring();
@@ -232,6 +303,66 @@ export default function Travel() {
           .hotel-sleep-float {
             animation: hotel-sleep-float 4.8s ease-in-out infinite;
           }
+
+          @keyframes travel-secret-enter {
+            0% {
+              opacity: 0;
+              transform: translate(-50%, -50%) scale(0.95);
+            }
+            100% {
+              opacity: 1;
+              transform: translate(-50%, -50%) scale(1);
+            }
+          }
+
+          @keyframes travel-secret-exit {
+            0% {
+              opacity: 1;
+              transform: translate(-50%, -50%) scale(1);
+            }
+            100% {
+              opacity: 0;
+              transform: translate(-50%, -50%) scale(0.985);
+            }
+          }
+
+          @keyframes travel-secret-float {
+            0%, 100% {
+              transform: translateY(0px);
+            }
+            50% {
+              transform: translateY(-3px);
+            }
+          }
+
+          @keyframes travel-suitcase-bounce {
+            0%, 100% {
+              transform: translateY(0px) scale(1);
+            }
+            8% {
+              transform: translateY(-2px) scale(1.004);
+            }
+            16% {
+              transform: translateY(0px) scale(1);
+            }
+          }
+
+          .travel-secret-enter {
+            animation: travel-secret-enter 400ms ease-out 1 both;
+          }
+
+          .travel-secret-exit {
+            animation: travel-secret-exit 400ms ease-in 1 both;
+          }
+
+          .travel-secret-float {
+            animation: travel-secret-float 4.2s ease-in-out infinite;
+          }
+
+          .travel-suitcase-bounce {
+            animation: travel-suitcase-bounce 2s ease-in-out infinite;
+            transform-origin: center bottom;
+          }
         `}
       </style>
 
@@ -251,9 +382,29 @@ export default function Travel() {
         </div>
       )}
 
+      {showTravelSecret && (
+        <div
+          className={`pointer-events-none fixed left-1/2 top-1/2 z-[9999] w-[min(86vw,380px)] ${
+            isTravelSecretLeaving ? "travel-secret-exit" : "travel-secret-enter"
+          }`}
+        >
+          <div className="travel-secret-float">
+            <img
+              src={travelEasterEgg}
+              alt=""
+              className="travel-suitcase-bounce h-auto w-full select-none drop-shadow-[0_26px_60px_rgba(0,0,0,0.14)]"
+              draggable={false}
+            />
+          </div>
+        </div>
+      )}
+
       <Section>
         <div className="mx-auto flex w-full max-w-[340px] flex-col items-center py-20 text-center">
-          <h2 className="font-serif text-5xl font-medium leading-none tracking-tight text-black">
+          <h2
+            className="font-serif text-5xl font-medium leading-none tracking-tight text-black"
+            onClick={handleTravelTitleTap}
+          >
             Travel
           </h2>
 
