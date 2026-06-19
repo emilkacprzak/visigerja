@@ -1,38 +1,43 @@
-import Container from "../ui/Container";
+import { CalendarDays, MapPinned } from "lucide-react";
 import Button from "../Shared/Button";
 import Section from "../Shared/Section";
-import { wedding } from "../../data/wedding";
 
 export default function Ceremony() {
   return (
     <Section>
-      <Container>
-        <div className="flex min-h-svh items-center justify-center py-20 text-center">
-          <div className="mx-auto max-w-2xl rounded-3xl border border-stone-200 bg-white/60 px-6 py-12 shadow-sm backdrop-blur-xl sm:px-10 sm:py-16">
-            <h2 className="font-serif text-5xl font-medium leading-none tracking-tight text-black sm:text-6xl">
-              Ceremony
-            </h2>
+      <div className="mx-auto flex w-full max-w-[340px] flex-col items-center py-20 text-center">
+        <h2 className="font-serif text-5xl font-medium leading-none tracking-tight text-black">
+          🏛️ Ceremony
+        </h2>
 
-            <p className="mx-auto mt-6 max-w-xl text-base font-light leading-7 text-stone-600 sm:text-lg">
-              The ceremony will take place at Copenhagen City Hall.
-            </p>
-
-            <div className="mx-auto mt-10 max-w-xs">
-              <Button
-                variant="primary"
-                href={wedding.ceremony.mapsUrl || undefined}
-                disabled={!wedding.ceremony.mapsUrl}
-              >
-                Open in Apple Maps
-              </Button>
-            </div>
-
-            <p className="mx-auto mt-6 max-w-md text-sm font-light leading-6 text-stone-500">
-              Address and additional details will be updated soon.
-            </p>
+        <div className="mt-8 space-y-3 text-stone-500">
+          <p className="text-lg font-light text-black">Copenhagen City Hall</p>
+          <div className="space-y-1 text-base font-light leading-7">
+            <p>Rådhuspladsen 1</p>
+            <p>1550 København V</p>
+            <p>Denmark</p>
           </div>
         </div>
-      </Container>
+
+        <div className="mt-10 flex w-full flex-col gap-4">
+          <Button variant="primary">
+            <span className="inline-flex items-center gap-2">
+              <MapPinned className="text-stone-700" size={26} strokeWidth={1.75} />
+              Open in Google Maps
+            </span>
+          </Button>
+          <Button variant="secondary">
+            <span className="inline-flex items-center gap-2">
+              <CalendarDays
+                className="text-stone-700"
+                size={26}
+                strokeWidth={1.75}
+              />
+              Add to Calendar
+            </span>
+          </Button>
+        </div>
+      </div>
     </Section>
   );
 }
