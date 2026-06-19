@@ -15,8 +15,9 @@ export const wedding = {
   },
 
   photos: {
-    uploadUrl: "",
     galleryUrl: "",
+    uploadUrl: "",
+    isEnabled: false,
   },
 
   links: {

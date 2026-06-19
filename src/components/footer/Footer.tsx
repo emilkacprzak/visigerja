@@ -1,7 +1,99 @@
+import { useRef, useState } from "react";
+import dancingBears from "../../assets/illustrations/bears-dancing.webp";
+import goodbyeBears from "../../assets/illustrations/bears-goodbye.webp";
 import { wedding } from "../../data/wedding";
+import { playGoodbyeWave, playRainbowDisco } from "../../lib/sounds";
+
+function wait(duration: number) {
+  return new Promise((resolve) => {
+    window.setTimeout(resolve, duration);
+  });
+}
 
 export default function Footer() {
+  const [showPrideEffect, setShowPrideEffect] = useState(false);
+  const [showDanceRipple, setShowDanceRipple] = useState(false);
+  const [showDanceOverlay, setShowDanceOverlay] = useState(false);
+  const [isDanceExiting, setIsDanceExiting] = useState(false);
+  const [showGoodbyeOverlay, setShowGoodbyeOverlay] = useState(false);
+  const [isGoodbyeExiting, setIsGoodbyeExiting] = useState(false);
+  const tapTimes = useRef<number[]>([]);
+  const goodbyeTapTimes = useRef<number[]>([]);
+  const hasDancePlayed = useRef(false);
+  const hasGoodbyePlayed = useRef(false);
+  const isDanceRunning = useRef(false);
+  const isGoodbyeRunning = useRef(false);
+  const stopGoodbyeSound = useRef<(() => void) | undefined>(undefined);
   const coupleNames = `${wedding.couple.partner1} & ${wedding.couple.partner2}`;
+
+  const runDanceSecret = async () => {
+    if (hasDancePlayed.current || isDanceRunning.current) {
+      return;
+    }
+
+    hasDancePlayed.current = true;
+    isDanceRunning.current = true;
+    setShowDanceRipple(true);
+    await wait(300);
+    setShowDanceRipple(false);
+    playRainbowDisco();
+    setShowDanceOverlay(true);
+    await wait(10000);
+    setIsDanceExiting(true);
+    await wait(400);
+    setShowDanceOverlay(false);
+    setIsDanceExiting(false);
+    isDanceRunning.current = false;
+  };
+
+  const handleHeartClick = () => {
+    const now = Date.now();
+
+    playRainbowDisco();
+    setShowPrideEffect(true);
+    window.setTimeout(() => setShowPrideEffect(false), 2000);
+
+    tapTimes.current = [...tapTimes.current, now].filter(
+      (tapTime) => now - tapTime <= 3000,
+    );
+
+    if (tapTimes.current.length >= 3) {
+      tapTimes.current = [];
+      void runDanceSecret();
+    }
+  };
+
+  const runGoodbyeSecret = async () => {
+    if (hasGoodbyePlayed.current || isGoodbyeRunning.current) {
+      return;
+    }
+
+    hasGoodbyePlayed.current = true;
+    isGoodbyeRunning.current = true;
+    stopGoodbyeSound.current = playGoodbyeWave();
+    setShowGoodbyeOverlay(true);
+    await wait(10000);
+    setIsGoodbyeExiting(true);
+    stopGoodbyeSound.current?.();
+    await wait(500);
+    setShowGoodbyeOverlay(false);
+    setIsGoodbyeExiting(false);
+    stopGoodbyeSound.current = undefined;
+    isGoodbyeRunning.current = false;
+  };
+
+  const handleGoodbyeClick = () => {
+    const now = Date.now();
+
+    goodbyeTapTimes.current = [...goodbyeTapTimes.current, now].filter(
+      (tapTime) => now - tapTime <= 3000,
+    );
+
+    if (goodbyeTapTimes.current.length >= 3) {
+      goodbyeTapTimes.current = [];
+      void runGoodbyeSecret();
+    }
+  };
 
   return (
     <footer className="px-6 py-20 text-center text-stone-500">
@@ -82,27 +174,257 @@ export default function Footer() {
           .pride-heart {
             animation: pride-heart 75s linear infinite;
           }
+
+          @keyframes footer-heart-pulse {
+            0%, 100% {
+              transform: scale(1);
+            }
+            18%, 48% {
+              transform: scale(1.08);
+            }
+            30%, 60% {
+              transform: scale(1);
+            }
+          }
+
+          @keyframes footer-rainbow-glow {
+            0%, 100% {
+              opacity: 0;
+            }
+            20%, 72% {
+              opacity: 0.28;
+            }
+          }
+
+          @keyframes footer-sparkle {
+            0%, 100% {
+              opacity: 0;
+              transform: translate(-50%, -50%) scale(0.7);
+            }
+            35%, 72% {
+              opacity: 0.85;
+              transform: translate(-50%, -50%) scale(1);
+            }
+          }
+
+          .footer-heart-pulse {
+            animation: footer-heart-pulse 2s ease-in-out 1;
+          }
+
+          .footer-rainbow-glow {
+            animation: footer-rainbow-glow 2s ease-in-out 1;
+          }
+
+          .footer-sparkle {
+            animation: footer-sparkle 1.6s ease-in-out 1;
+          }
+
+          @keyframes footer-dance-ripple {
+            0% {
+              opacity: 0.26;
+              transform: scale(0.82);
+            }
+            100% {
+              opacity: 0;
+              transform: scale(3.2);
+            }
+          }
+
+          @keyframes dancing-bears-enter {
+            0% {
+              opacity: 0;
+              transform: translate(-50%, -50%) scale(0.95);
+            }
+            100% {
+              opacity: 1;
+              transform: translate(-50%, -50%) scale(1);
+            }
+          }
+
+          @keyframes dancing-bears-exit {
+            0% {
+              opacity: 1;
+              transform: translate(-50%, -50%) scale(1);
+            }
+            100% {
+              opacity: 0;
+              transform: translate(-50%, -50%) scale(0.985);
+            }
+          }
+
+          @keyframes dancing-bears-groove {
+            0%, 100% {
+              transform: translateY(0px) rotate(-2deg);
+            }
+            50% {
+              transform: translateY(-4px) rotate(2deg);
+            }
+          }
+
+          @keyframes dance-sparkle {
+            0%, 100% {
+              opacity: 0;
+              transform: translate3d(0, 6px, 0) scale(0.78);
+            }
+            34%, 68% {
+              opacity: 0.72;
+              transform: translate3d(0, -4px, 0) scale(1);
+            }
+          }
+
+          .footer-dance-ripple {
+            animation: footer-dance-ripple 300ms ease-out 1;
+          }
+
+          .dancing-bears-enter {
+            animation: dancing-bears-enter 400ms ease-out 1 both;
+          }
+
+          .dancing-bears-exit {
+            animation: dancing-bears-exit 400ms ease-in 1 both;
+          }
+
+          .dancing-bears-groove {
+            animation: dancing-bears-groove 700ms ease-in-out infinite;
+            transform-origin: center bottom;
+          }
+
+          .dance-sparkle {
+            animation: dance-sparkle 2.4s ease-in-out infinite;
+          }
+
+          @keyframes goodbye-bears-enter {
+            0% {
+              opacity: 0;
+              transform: translate(-50%, -50%) scale(0.985);
+            }
+            100% {
+              opacity: 1;
+              transform: translate(-50%, -50%) scale(1);
+            }
+          }
+
+          @keyframes goodbye-bears-exit {
+            0% {
+              opacity: 1;
+              transform: translate(-50%, -50%) scale(1);
+            }
+            100% {
+              opacity: 0;
+              transform: translate(-50%, -50%) scale(0.99);
+            }
+          }
+
+          @keyframes goodbye-wave {
+            0%, 100% {
+              transform: translateY(0px) rotate(-1deg);
+            }
+            50% {
+              transform: translateY(-2px) rotate(1deg);
+            }
+          }
+
+          .goodbye-bears-enter {
+            animation: goodbye-bears-enter 500ms ease-out 1 both;
+          }
+
+          .goodbye-bears-exit {
+            animation: goodbye-bears-exit 500ms ease-in 1 both;
+          }
+
+          .goodbye-wave {
+            animation: goodbye-wave 800ms ease-in-out infinite;
+            transform-origin: center bottom;
+          }
         `}
       </style>
       <div className="mx-auto flex max-w-[340px] flex-col items-center gap-4">
-        <svg
-          className="h-6 w-6"
-          viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg"
-          aria-hidden="true"
+        <button
+          type="button"
+          className="relative flex h-8 w-8 items-center justify-center"
+          aria-label="Play pride celebration"
+          onClick={handleHeartClick}
         >
-          <path
-            className="pride-heart"
-            d="M12 21.35L10.55 20.03C5.4 15.36 2 12.28 2 8.5C2 5.42 4.42 3 7.5 3C9.24 3 10.91 3.81 12 5.08C13.09 3.81 14.76 3 16.5 3C19.58 3 22 5.42 22 8.5C22 12.28 18.6 15.36 13.45 20.04L12 21.35Z"
-            fill="#D4AF37"
-          />
-        </svg>
+          {showDanceRipple && (
+            <span className="footer-dance-ripple pointer-events-none absolute h-10 w-10 rounded-full bg-[conic-gradient(from_90deg,#E40303,#FF8C00,#FFED00,#008026,#24408E,#732982,#5BCEFA,#F5A9B8,#D4AF37)] blur-sm" />
+          )}
+          {showPrideEffect && (
+            <>
+              <span className="footer-rainbow-glow pointer-events-none absolute h-10 w-10 rounded-full bg-[conic-gradient(from_90deg,#E40303,#FF8C00,#FFED00,#008026,#24408E,#732982,#5BCEFA,#F5A9B8,#D4AF37)] blur-md" />
+              <span className="footer-sparkle pointer-events-none absolute left-1 top-1 text-[8px] leading-none text-[#D4AF37]">
+                ✦
+              </span>
+              <span className="footer-sparkle pointer-events-none absolute right-1 top-2 text-[7px] leading-none text-[#5BCEFA]">
+                ✦
+              </span>
+              <span className="footer-sparkle pointer-events-none absolute bottom-1 left-1/2 text-[7px] leading-none text-[#F5A9B8]">
+                ✦
+              </span>
+            </>
+          )}
+          <svg
+            className={`relative h-6 w-6 ${showPrideEffect ? "footer-heart-pulse" : ""}`}
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+            aria-hidden="true"
+          >
+            <path
+              className="pride-heart"
+              d="M12 21.35L10.55 20.03C5.4 15.36 2 12.28 2 8.5C2 5.42 4.42 3 7.5 3C9.24 3 10.91 3.81 12 5.08C13.09 3.81 14.76 3 16.5 3C19.58 3 22 5.42 22 8.5C22 12.28 18.6 15.36 13.45 20.04L12 21.35Z"
+              fill="#D4AF37"
+            />
+          </svg>
+        </button>
         <p className="text-sm font-light">Made with love</p>
         <p className="font-['Great_Vibes',cursive] text-[2.3rem] font-normal leading-none text-stone-800">
           {coupleNames}
         </p>
-        <p className="text-sm font-light">See you in Copenhagen 🇩🇰</p>
+        <p className="text-sm font-light" onClick={handleGoodbyeClick}>
+          See you in Copenhagen 🇩🇰
+        </p>
       </div>
+      {showDanceOverlay && (
+        <div
+          className={`pointer-events-none fixed left-1/2 top-1/2 z-50 w-[min(84vw,360px)] ${
+            isDanceExiting ? "dancing-bears-exit" : "dancing-bears-enter"
+          }`}
+        >
+          <div className="relative">
+            <span className="dance-sparkle absolute -left-2 top-8 text-[10px] leading-none text-[#E40303]">
+              ✦
+            </span>
+            <span className="dance-sparkle absolute right-6 top-0 text-[9px] leading-none text-[#5BCEFA] [animation-delay:450ms]">
+              ✦
+            </span>
+            <span className="dance-sparkle absolute -right-1 top-28 text-[10px] leading-none text-[#FFED00] [animation-delay:900ms]">
+              ✦
+            </span>
+            <span className="dance-sparkle absolute bottom-8 left-8 text-[8px] leading-none text-[#F5A9B8] [animation-delay:1350ms]">
+              ✦
+            </span>
+            <img
+              src={dancingBears}
+              alt=""
+              className="dancing-bears-groove h-auto w-full select-none drop-shadow-[0_24px_55px_rgba(0,0,0,0.12)]"
+              draggable={false}
+            />
+          </div>
+        </div>
+      )}
+      {showGoodbyeOverlay && (
+        <div
+          className={`pointer-events-none fixed left-1/2 top-1/2 z-50 w-[min(84vw,360px)] ${
+            isGoodbyeExiting ? "goodbye-bears-exit" : "goodbye-bears-enter"
+          }`}
+        >
+          <img
+            src={goodbyeBears}
+            alt=""
+            className="goodbye-wave h-auto w-full select-none drop-shadow-[0_26px_60px_rgba(0,0,0,0.12)]"
+            draggable={false}
+          />
+        </div>
+      )}
     </footer>
   );
 }

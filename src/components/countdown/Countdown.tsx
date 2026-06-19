@@ -1,5 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import countdownBears from "../../assets/illustrations/bears-countdown-easter-egg.webp";
 import { wedding } from "../../data/wedding";
+import { playWatchTickLoop } from "../../lib/sounds";
 
 function getCountdown() {
   const target = new Date(
@@ -14,11 +16,23 @@ function getCountdown() {
   return { days, hours, minutes };
 }
 
+function wait(duration: number) {
+  return new Promise((resolve) => {
+    window.setTimeout(resolve, duration);
+  });
+}
+
 export default function Countdown() {
   const hasDate = Boolean(wedding.ceremony.date);
+  const tapTimes = useRef<number[]>([]);
+  const hasSecretPlayed = useRef(false);
+  const isSecretRunning = useRef(false);
+  const stopTicking = useRef<(() => void) | undefined>(undefined);
   const [time, setTime] = useState(() =>
     hasDate ? getCountdown() : { days: 0, hours: 0, minutes: 0 },
   );
+  const [showSecret, setShowSecret] = useState(false);
+  const [isSecretExiting, setIsSecretExiting] = useState(false);
 
   useEffect(() => {
     if (!hasDate) {
@@ -32,10 +46,106 @@ export default function Countdown() {
     return () => window.clearInterval(timer);
   }, [hasDate]);
 
+  const runCountdownSecret = async () => {
+    if (hasSecretPlayed.current || isSecretRunning.current) {
+      return;
+    }
+
+    hasSecretPlayed.current = true;
+    isSecretRunning.current = true;
+    stopTicking.current = playWatchTickLoop();
+    setShowSecret(true);
+    await wait(10000);
+    setIsSecretExiting(true);
+    stopTicking.current?.();
+    await wait(400);
+    setShowSecret(false);
+    setIsSecretExiting(false);
+    stopTicking.current = undefined;
+    isSecretRunning.current = false;
+  };
+
+  const handleTitleTap = () => {
+    const now = Date.now();
+
+    tapTimes.current = [...tapTimes.current, now].filter(
+      (tapTime) => now - tapTime <= 3000,
+    );
+
+    if (tapTimes.current.length >= 3) {
+      tapTimes.current = [];
+      void runCountdownSecret();
+    }
+  };
+
   return (
     <section className="px-6 py-20">
+      <style>
+        {`
+          @keyframes countdown-secret-enter {
+            0% {
+              opacity: 0;
+              transform: translate(-50%, -50%) scale(0.985);
+            }
+            100% {
+              opacity: 1;
+              transform: translate(-50%, -50%) scale(1);
+            }
+          }
+
+          @keyframes countdown-secret-exit {
+            0% {
+              opacity: 1;
+              transform: translate(-50%, -50%) scale(1);
+            }
+            100% {
+              opacity: 0;
+              transform: translate(-50%, -50%) scale(0.99);
+            }
+          }
+
+          @keyframes countdown-float {
+            0%, 100% {
+              transform: translateY(0px) scale(0.99);
+            }
+            50% {
+              transform: translateY(-2px) scale(1);
+            }
+          }
+
+          @keyframes countdown-tick-pulse {
+            0%, 100% {
+              transform: scale(1);
+            }
+            8% {
+              transform: scale(1.003);
+            }
+          }
+
+          .countdown-secret-enter {
+            animation: countdown-secret-enter 400ms ease-out 1 both;
+          }
+
+          .countdown-secret-exit {
+            animation: countdown-secret-exit 400ms ease-in 1 both;
+          }
+
+          .countdown-float {
+            animation: countdown-float 3.8s ease-in-out infinite;
+            transform-origin: center bottom;
+          }
+
+          .countdown-tick-pulse {
+            animation: countdown-tick-pulse 1s ease-out infinite;
+            transform-origin: center;
+          }
+        `}
+      </style>
       <div className="mx-auto max-w-[340px] text-center">
-        <h2 className="font-serif text-5xl font-medium leading-none tracking-tight text-black">
+        <h2
+          className="font-serif text-5xl font-medium leading-none tracking-tight text-black"
+          onClick={handleTitleTap}
+        >
           Countdown
         </h2>
 
@@ -71,6 +181,22 @@ export default function Countdown() {
           )}
         </div>
       </div>
+      {showSecret && (
+        <div
+          className={`pointer-events-none fixed left-1/2 top-1/2 z-50 w-[min(86vw,360px)] ${
+            isSecretExiting ? "countdown-secret-exit" : "countdown-secret-enter"
+          }`}
+        >
+          <div className="countdown-tick-pulse">
+            <img
+              src={countdownBears}
+              alt=""
+              className="countdown-float h-auto w-full select-none drop-shadow-[0_26px_60px_rgba(0,0,0,0.12)]"
+              draggable={false}
+            />
+          </div>
+        </div>
+      )}
     </section>
   );
 }
