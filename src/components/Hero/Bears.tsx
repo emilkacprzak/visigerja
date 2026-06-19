@@ -1,110 +1,194 @@
 export default function Bears() {
   return (
     <svg
-      width="360"
+      className="h-auto w-[115%] max-w-[414px]"
       viewBox="0 0 360 300"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       role="img"
       aria-labelledby="bears-title"
     >
-      <title id="bears-title">Two teddy bears with hearts</title>
+      <title id="bears-title">Two minimalist teddy bears facing each other</title>
 
-      <g stroke="#7A5A3A" strokeLinecap="round" strokeLinejoin="round">
-        <path
-          d="M159 68C159 52.536 146.464 40 131 40C116.375 40 104.369 51.212 103.107 65.509C89.273 74.721 80.5 90.473 80.5 108.5C80.5 137.495 103.505 161 132.5 161C161.495 161 185 137.495 185 108.5C185 91.287 174.708 76.118 159 68Z"
-          fill="#F6EFE4"
-          strokeWidth="3"
-        />
-        <path
-          d="M122.5 42C128.5 33.5 141 33 148 40.5C155 48 154.5 60.5 146.5 67"
-          fill="#F6EFE4"
-          strokeWidth="3"
-        />
-        <path
-          d="M104 64.5C95.5 57.5 83 59.5 77 68C71 76.5 73.5 89.5 82.5 95"
-          fill="#F6EFE4"
-          strokeWidth="3"
-        />
-        <path
-          d="M111.5 112.5C115 120 124 124 133.5 124C143 124 151.5 119.5 155 112.5"
-          strokeWidth="2.5"
-        />
-        <path d="M116 96.5C118.5 93.5 122 93.5 124.5 96.5" strokeWidth="2.5" />
-        <path d="M145 96.5C147.5 93.5 151 93.5 153.5 96.5" strokeWidth="2.5" />
-        <path
-          d="M133.5 105C137 105 140 107 140 110C140 113 137 115 133.5 115C130 115 127 113 127 110C127 107 130 105 133.5 105Z"
-          fill="#7A5A3A"
-          strokeWidth="2"
-        />
-        <path
-          d="M95 153C74.5 164.5 63 187.5 63 217V251H196V217C196 187.5 184.5 164.5 164 153"
-          fill="#F6EFE4"
-          strokeWidth="3"
-        />
-        <path
-          d="M84 218C72 218 62 228 62 240V251H97V232C97 224.268 91.732 218 84 218Z"
-          fill="#F6EFE4"
-          strokeWidth="3"
-        />
-        <path
-          d="M177 218C189 218 199 228 199 240V251H164V232C164 224.268 169.268 218 177 218Z"
-          fill="#F6EFE4"
-          strokeWidth="3"
-        />
-        <path d="M109 182C119 191 143 191 153 182" strokeWidth="2.5" />
+      <style>
+        {`
+          .bear-breathe {
+            animation: bear-breathe 4.8s ease-in-out infinite;
+            transform-box: fill-box;
+            transform-origin: center bottom;
+          }
 
-        <path
-          d="M257 71C257 55.536 244.464 43 229 43C214.947 43 203.311 53.349 201.298 66.842C186.1 75.665 176 92.125 176 111C176 140.271 199.729 164 229 164C258.271 164 282 140.271 282 111C282 93.838 271.825 78.74 257 71Z"
-          fill="#F6EFE4"
-          strokeWidth="3"
-        />
-        <path
-          d="M220 45C226 36.5 238.5 36 245.5 43.5C252.5 51 252 63.5 244 70"
-          fill="#F6EFE4"
-          strokeWidth="3"
-        />
-        <path
-          d="M201.5 66.5C193 59.5 180.5 61.5 174.5 70C168.5 78.5 171 91.5 180 97"
-          fill="#F6EFE4"
-          strokeWidth="3"
-        />
-        <path d="M214 99C216.5 96 220 96 222.5 99" strokeWidth="2.5" />
-        <path d="M244 99C246.5 96 250 96 252.5 99" strokeWidth="2.5" />
-        <path
-          d="M229.5 108C233 108 236 110 236 113C236 116 233 118 229.5 118C226 118 223 116 223 113C223 110 226 108 229.5 108Z"
-          fill="#7A5A3A"
-          strokeWidth="2"
-        />
-        <path d="M219 126C225 131 235 131 241 126" strokeWidth="2.5" />
-        <path
-          d="M192 156C171.5 167.5 160 190.5 160 220V251H294V220C294 190.5 282.5 167.5 262 156"
-          fill="#F6EFE4"
-          strokeWidth="3"
-        />
-        <path
-          d="M181 220C169 220 159 230 159 242V251H194V234C194 226.268 188.732 220 181 220Z"
-          fill="#F6EFE4"
-          strokeWidth="3"
-        />
-        <path
-          d="M275 220C287 220 297 230 297 242V251H262V234C262 226.268 267.268 220 275 220Z"
-          fill="#F6EFE4"
-          strokeWidth="3"
-        />
+          .heart-float {
+            animation: heart-float 4.8s ease-in-out infinite;
+            transform-box: fill-box;
+            transform-origin: center;
+          }
 
-        <path d="M174 114C185 113 194 108 200 98" strokeWidth="2.5" />
-        <path
-          d="M188 103C192 99 198 99.5 201 104.5"
-          strokeWidth="2.5"
-        />
+          @keyframes bear-breathe {
+            0%, 100% {
+              transform: scale(1) translateY(0);
+            }
+            50% {
+              transform: scale(1.012) translateY(-1px);
+            }
+          }
+
+          @keyframes heart-float {
+            0%, 100% {
+              transform: translateY(0) scale(1);
+            }
+            50% {
+              transform: translateY(-2px) scale(1.035);
+            }
+          }
+        `}
+      </style>
+
+      <g className="bear-breathe">
+        <g transform="translate(53 55) rotate(-6 92 105)">
+          <path
+            d="M102 151C126.853 151 147 171.147 147 196V222H37V196C37 171.147 57.147 151 82 151H102Z"
+            fill="#EADCC8"
+            stroke="#8A6A4F"
+            strokeWidth="3"
+          />
+          <path
+            d="M55.5 177.5C43.35 180.937 35 192.034 35 204.66V222H69V190.5"
+            fill="#EADCC8"
+            stroke="#8A6A4F"
+            strokeWidth="3"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+          <path
+            d="M128.5 177.5C140.65 180.937 149 192.034 149 204.66V222H115V190.5"
+            fill="#EADCC8"
+            stroke="#8A6A4F"
+            strokeWidth="3"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+          <circle
+            cx="51"
+            cy="68"
+            r="21"
+            fill="#EADCC8"
+            stroke="#8A6A4F"
+            strokeWidth="3"
+          />
+          <circle
+            cx="133"
+            cy="68"
+            r="21"
+            fill="#EADCC8"
+            stroke="#8A6A4F"
+            strokeWidth="3"
+          />
+          <circle
+            cx="92"
+            cy="93"
+            r="55"
+            fill="#EADCC8"
+            stroke="#8A6A4F"
+            strokeWidth="3"
+          />
+          <ellipse cx="92" cy="112" rx="23" ry="17" fill="#F7EFE4" />
+          <circle cx="74" cy="90" r="3.6" fill="#171717" />
+          <circle cx="111" cy="90" r="3.6" fill="#171717" />
+          <path
+            d="M92 102.5C96.142 102.5 99.5 104.739 99.5 107.5C99.5 110.261 96.142 112.5 92 112.5C87.858 112.5 84.5 110.261 84.5 107.5C84.5 104.739 87.858 102.5 92 102.5Z"
+            fill="#171717"
+          />
+          <path
+            d="M92 113V119"
+            stroke="#8A6A4F"
+            strokeWidth="2.2"
+            strokeLinecap="round"
+          />
+          <path
+            d="M82 122C86 126 98 126 102 122"
+            stroke="#8A6A4F"
+            strokeWidth="2.2"
+            strokeLinecap="round"
+          />
+        </g>
       </g>
 
-      <g fill="#B48A78">
-        <path d="M177.768 22.339C181.378 16.795 190 19.418 190 26.007C190 19.418 198.622 16.795 202.232 22.339C204.841 26.345 203.656 31.746 199.615 34.251L190 40.21L180.385 34.251C176.344 31.746 175.159 26.345 177.768 22.339Z" />
-        <path d="M121.073 18.577C123.601 14.696 129.636 16.532 129.636 21.144C129.636 16.532 135.671 14.696 138.199 18.577C140.025 21.381 139.195 25.162 136.366 26.916L129.636 31.087L122.906 26.916C120.077 25.162 119.247 21.381 121.073 18.577Z" />
-        <path d="M227.073 20.577C229.601 16.696 235.636 18.532 235.636 23.144C235.636 18.532 241.671 16.696 244.199 20.577C246.025 23.381 245.195 27.162 242.366 28.916L235.636 33.087L228.906 28.916C226.077 27.162 225.247 23.381 227.073 20.577Z" />
+      <g className="bear-breathe">
+        <g transform="translate(160 55) rotate(6 92 105)">
+          <path
+            d="M102 151C126.853 151 147 171.147 147 196V222H37V196C37 171.147 57.147 151 82 151H102Z"
+            fill="#EFE3D2"
+            stroke="#8A6A4F"
+            strokeWidth="3"
+          />
+          <path
+            d="M55.5 177.5C43.35 180.937 35 192.034 35 204.66V222H69V190.5"
+            fill="#EFE3D2"
+            stroke="#8A6A4F"
+            strokeWidth="3"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+          <path
+            d="M128.5 177.5C140.65 180.937 149 192.034 149 204.66V222H115V190.5"
+            fill="#EFE3D2"
+            stroke="#8A6A4F"
+            strokeWidth="3"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+          <circle
+            cx="51"
+            cy="68"
+            r="21"
+            fill="#EFE3D2"
+            stroke="#8A6A4F"
+            strokeWidth="3"
+          />
+          <circle
+            cx="133"
+            cy="68"
+            r="21"
+            fill="#EFE3D2"
+            stroke="#8A6A4F"
+            strokeWidth="3"
+          />
+          <circle
+            cx="92"
+            cy="93"
+            r="55"
+            fill="#EFE3D2"
+            stroke="#8A6A4F"
+            strokeWidth="3"
+          />
+          <ellipse cx="92" cy="112" rx="23" ry="17" fill="#FAF3EA" />
+          <circle cx="73" cy="90" r="3.6" fill="#171717" />
+          <circle cx="110" cy="90" r="3.6" fill="#171717" />
+          <path
+            d="M92 102.5C96.142 102.5 99.5 104.739 99.5 107.5C99.5 110.261 96.142 112.5 92 112.5C87.858 112.5 84.5 110.261 84.5 107.5C84.5 104.739 87.858 102.5 92 102.5Z"
+            fill="#171717"
+          />
+          <path
+            d="M92 113V119"
+            stroke="#8A6A4F"
+            strokeWidth="2.2"
+            strokeLinecap="round"
+          />
+          <path
+            d="M82 122C86 126 98 126 102 122"
+            stroke="#8A6A4F"
+            strokeWidth="2.2"
+            strokeLinecap="round"
+          />
+        </g>
       </g>
+
+      <path
+        className="heart-float"
+        d="M172.83 116.39C176.04 111.43 183.81 113.78 183.81 119.68C183.81 113.78 191.58 111.43 194.79 116.39C197.1 119.97 196.05 124.77 192.43 127.02L183.81 132.37L175.19 127.02C171.57 124.77 170.52 119.97 172.83 116.39Z"
+        fill="#B9975B"
+      />
     </svg>
   );
 }
