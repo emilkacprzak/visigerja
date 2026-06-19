@@ -1,11 +1,11 @@
-import InfoCards from "../components/Cards/InfoCards";
-import Hero from "../components/Hero/Hero";
+import Ceremony from "../components/ceremony/Ceremony";
+import Intro from "../components/Intro";
 
 export default function Home() {
   return (
     <>
-      <Hero />
-      <InfoCards />
+      <Intro />
+      <Ceremony />
     </>
   );
 }

@@ -23,7 +23,7 @@ export default function InfoCard({
 
   const content = (
     <>
-      <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-2xl bg-stone-100 text-stone-900">
+      <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-stone-100 text-stone-900">
         {icon}
       </div>
 

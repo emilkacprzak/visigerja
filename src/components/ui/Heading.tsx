@@ -12,7 +12,7 @@ export default function Heading({ title, subtitle }: HeadingProps) {
         </p>
       )}
 
-      <h2 className="mt-4 font-serif text-5xl font-medium leading-none tracking-normal text-black sm:text-6xl md:text-7xl">
+      <h2 className="mt-4 font-serif text-6xl font-medium leading-none tracking-tight text-black sm:text-7xl md:text-8xl">
         {title}
       </h2>
     </div>

@@ -13,7 +13,7 @@ export default function InfoCards() {
         <InfoCard
           title={content.cards.ceremony.title}
           description={content.cards.ceremony.description}
-          icon={<MapPinned size={24} strokeWidth={1.75} />}
+          icon={<MapPinned className="text-stone-700" size={28} strokeWidth={1.75} />}
           href={wedding.ceremony.mapsUrl || undefined}
           disabled={!wedding.ceremony.mapsUrl}
         />
@@ -21,7 +21,7 @@ export default function InfoCards() {
         <InfoCard
           title={content.cards.calendar.title}
           description={content.cards.calendar.description}
-          icon={<CalendarDays size={24} strokeWidth={1.75} />}
+          icon={<CalendarDays className="text-stone-700" size={28} strokeWidth={1.75} />}
           href={wedding.links.calendar || undefined}
           disabled={!wedding.links.calendar}
         />
@@ -29,7 +29,7 @@ export default function InfoCards() {
         <InfoCard
           title={content.cards.photos.title}
           description={content.cards.photos.description}
-          icon={<Camera size={24} strokeWidth={1.75} />}
+          icon={<Camera className="text-stone-700" size={28} strokeWidth={1.75} />}
           href={photosUrl || undefined}
           disabled={!photosUrl}
         />

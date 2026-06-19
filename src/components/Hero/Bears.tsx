@@ -1,7 +1,7 @@
 export default function Bears() {
   return (
     <svg
-      className="h-auto w-[115%] max-w-[414px]"
+      className="h-auto w-[145%] max-w-[570px] drop-shadow-sm"
       viewBox="0 0 360 300"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
@@ -13,32 +13,17 @@ export default function Bears() {
       <style>
         {`
           .bear-breathe {
-            animation: bear-breathe 4.8s ease-in-out infinite;
+            animation: bear-breathe 4s ease-in-out infinite;
             transform-box: fill-box;
             transform-origin: center bottom;
           }
 
-          .heart-float {
-            animation: heart-float 4.8s ease-in-out infinite;
-            transform-box: fill-box;
-            transform-origin: center;
-          }
-
           @keyframes bear-breathe {
             0%, 100% {
-              transform: scale(1) translateY(0);
+              transform: scale(1);
             }
             50% {
-              transform: scale(1.012) translateY(-1px);
-            }
-          }
-
-          @keyframes heart-float {
-            0%, 100% {
-              transform: translateY(0) scale(1);
-            }
-            50% {
-              transform: translateY(-2px) scale(1.035);
+              transform: scale(1.015);
             }
           }
         `}
@@ -185,7 +170,6 @@ export default function Bears() {
       </g>
 
       <path
-        className="heart-float"
         d="M172.83 116.39C176.04 111.43 183.81 113.78 183.81 119.68C183.81 113.78 191.58 111.43 194.79 116.39C197.1 119.97 196.05 124.77 192.43 127.02L183.81 132.37L175.19 127.02C171.57 124.77 170.52 119.97 172.83 116.39Z"
         fill="#B9975B"
       />
