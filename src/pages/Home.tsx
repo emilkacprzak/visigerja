@@ -1,4 +1,3 @@
-import Ceremony from "../components/ceremony/Ceremony";
 import Countdown from "../components/countdown/Countdown";
 import Footer from "../components/footer/Footer";
 import Hero from "../components/Hero/Hero";
@@ -12,7 +11,6 @@ export default function Home() {
     <>
       <Navigation />
       <Hero />
-      <Ceremony />
       <Countdown />
       <WeddingCeremony />
       <Travel />

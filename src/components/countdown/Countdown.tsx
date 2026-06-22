@@ -1,7 +1,14 @@
 import { useEffect, useRef, useState } from "react";
 import countdownBears from "../../assets/illustrations/bears-countdown-easter-egg.webp";
 import { wedding } from "../../data/wedding";
-import { playWatchTickLoop } from "../../lib/sounds";
+import {
+  finishEasterEgg,
+  preloadAudio,
+  startEasterEgg,
+  stopAudio,
+  stopEasterEgg,
+} from "../../lib/easterEggs";
+import EasterEggOverlay from "../Shared/EasterEggOverlay";
 
 function getTimeZoneOffset(date: Date, timeZone: string) {
   const parts = new Intl.DateTimeFormat("en-US", {
@@ -48,30 +55,26 @@ function getCountdown() {
     wedding.ceremony.timeZone,
   );
   const remaining = target - Date.now();
-  const totalMinutes = Math.max(Math.ceil(remaining / 1000 / 60), 0);
-  const days = Math.floor(totalMinutes / 60 / 24);
-  const hours = Math.floor((totalMinutes / 60) % 24);
-  const minutes = totalMinutes % 60;
+  const totalSeconds = Math.max(Math.floor(remaining / 1000), 0);
+  const days = Math.floor(totalSeconds / 60 / 60 / 24);
+  const hours = Math.floor((totalSeconds / 60 / 60) % 24);
+  const minutes = Math.floor((totalSeconds / 60) % 60);
+  const seconds = totalSeconds % 60;
 
-  return { days, hours, minutes, isComplete: remaining <= 0 };
+  return { days, hours, minutes, seconds, isComplete: remaining <= 0 };
 }
 
-function wait(duration: number) {
-  return new Promise((resolve) => {
-    window.setTimeout(resolve, duration);
-  });
-}
+const COUNTDOWN_EASTER_EGG_ID = "countdown";
+const COUNTDOWN_AUDIO_URL = `${import.meta.env.BASE_URL}audio/clock-ticking-web-mono.mp3`;
 
 export default function Countdown() {
   const hasDate = Boolean(wedding.ceremony.date);
-  const tapTimes = useRef<number[]>([]);
-  const hasSecretPlayed = useRef(false);
-  const isSecretRunning = useRef(false);
-  const stopTicking = useRef<(() => void) | undefined>(undefined);
+  const timers = useRef<number[]>([]);
+  const audioRef = useRef<HTMLAudioElement | undefined>(undefined);
   const [time, setTime] = useState(() =>
     hasDate
       ? getCountdown()
-      : { days: 0, hours: 0, minutes: 0, isComplete: false },
+      : { days: 0, hours: 0, minutes: 0, seconds: 0, isComplete: false },
   );
   const [showSecret, setShowSecret] = useState(false);
   const [isSecretExiting, setIsSecretExiting] = useState(false);
@@ -88,40 +91,85 @@ export default function Countdown() {
     return () => window.clearInterval(timer);
   }, [hasDate]);
 
-  const runCountdownSecret = async () => {
-    if (hasSecretPlayed.current || isSecretRunning.current) {
+  const resetCountdownSecret = () => {
+    timers.current.forEach((timer) => window.clearTimeout(timer));
+    timers.current = [];
+
+    if (audioRef.current) {
+      audioRef.current.onended = null;
+      stopAudio(audioRef.current);
+    }
+
+    setShowSecret(false);
+    setIsSecretExiting(false);
+  };
+
+  useEffect(() => {
+    audioRef.current = preloadAudio(COUNTDOWN_AUDIO_URL);
+
+    return () => {
+      stopEasterEgg(COUNTDOWN_EASTER_EGG_ID);
+
+      if (audioRef.current) {
+        audioRef.current.onended = null;
+        stopAudio(audioRef.current);
+      }
+    };
+  }, []);
+
+  const runCountdownSecret = () => {
+    startEasterEgg(COUNTDOWN_EASTER_EGG_ID, () => {
+      resetCountdownSecret();
+
+      const audio = audioRef.current ?? preloadAudio(COUNTDOWN_AUDIO_URL);
+
+      audioRef.current = audio;
+      audio.currentTime = 0;
+      audio.onended = closeCountdownSecret;
+
+      void audio
+        .play()
+        .then(() => {
+          setShowSecret(true);
+        })
+        .catch(() => {
+          stopAudio(audio);
+          finishEasterEgg(COUNTDOWN_EASTER_EGG_ID);
+        });
+
+      return resetCountdownSecret;
+    });
+  };
+
+  const handleSectionClick = () => {
+    runCountdownSecret();
+  };
+
+  const closeCountdownSecret = () => {
+    if (isSecretExiting) {
       return;
     }
 
-    hasSecretPlayed.current = true;
-    isSecretRunning.current = true;
-    stopTicking.current = playWatchTickLoop();
-    setShowSecret(true);
-    await wait(10000);
+    timers.current.forEach((timer) => window.clearTimeout(timer));
+    timers.current = [];
     setIsSecretExiting(true);
-    stopTicking.current?.();
-    await wait(400);
-    setShowSecret(false);
-    setIsSecretExiting(false);
-    stopTicking.current = undefined;
-    isSecretRunning.current = false;
-  };
 
-  const handleTitleTap = () => {
-    const now = Date.now();
-
-    tapTimes.current = [...tapTimes.current, now].filter(
-      (tapTime) => now - tapTime <= 3000,
-    );
-
-    if (tapTimes.current.length >= 3) {
-      tapTimes.current = [];
-      void runCountdownSecret();
+    if (audioRef.current) {
+      audioRef.current.onended = null;
+      stopAudio(audioRef.current);
     }
+
+    timers.current.push(
+      window.setTimeout(() => {
+        setShowSecret(false);
+        setIsSecretExiting(false);
+        finishEasterEgg(COUNTDOWN_EASTER_EGG_ID);
+      }, 400),
+    );
   };
 
   return (
-    <section className="px-6 pb-20 pt-16">
+    <section className="px-6 pb-20 pt-16" onClick={handleSectionClick}>
       <style>
         {`
           @keyframes countdown-secret-enter {
@@ -184,10 +232,7 @@ export default function Countdown() {
         `}
       </style>
       <div className="mx-auto max-w-[340px] text-center">
-        <h2
-          className="font-serif text-5xl font-medium leading-none tracking-tight text-black"
-          onClick={handleTitleTap}
-        >
+        <h2 className="font-serif text-5xl font-medium leading-none tracking-tight text-black">
           Countdown
         </h2>
 
@@ -201,7 +246,7 @@ export default function Countdown() {
               Today is our wedding day ❤️
             </p>
           ) : hasDate ? (
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
               <div>
                 <p className="text-3xl font-light text-black">{time.days}</p>
                 <p className="mt-1 text-xs font-light text-stone-500">days</p>
@@ -213,6 +258,10 @@ export default function Countdown() {
               <div>
                 <p className="text-3xl font-light text-black">{time.minutes}</p>
                 <p className="mt-1 text-xs font-light text-stone-500">minutes</p>
+              </div>
+              <div>
+                <p className="text-3xl font-light text-black">{time.seconds}</p>
+                <p className="mt-1 text-xs font-light text-stone-500">seconds</p>
               </div>
             </div>
           ) : (
@@ -228,20 +277,20 @@ export default function Countdown() {
         </div>
       </div>
       {showSecret && (
-        <div
-          className={`pointer-events-none fixed left-1/2 top-1/2 z-50 w-[min(86vw,360px)] ${
-            isSecretExiting ? "countdown-secret-exit" : "countdown-secret-enter"
-          }`}
+        <EasterEggOverlay
+          ariaLabel="Close countdown Easter egg"
+          isExiting={isSecretExiting}
+          onClose={closeCountdownSecret}
         >
-          <div className="countdown-tick-pulse">
+          <div className="countdown-tick-pulse w-[min(90vw,360px)] max-h-[90vh]">
             <img
               src={countdownBears}
               alt=""
-              className="countdown-float h-auto w-full select-none drop-shadow-[0_26px_60px_rgba(0,0,0,0.12)]"
+              className="countdown-float h-auto max-h-[90vh] w-full select-none object-contain drop-shadow-[0_26px_60px_rgba(0,0,0,0.12)]"
               draggable={false}
             />
           </div>
-        </div>
+        </EasterEggOverlay>
       )}
     </section>
   );

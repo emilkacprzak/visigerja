@@ -1,24 +1,24 @@
-import { useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Camera } from "lucide-react";
 import selfie from "../../assets/illustrations/bears-selfie-love.webp";
 import { wedding } from "../../data/wedding";
 import {
-  consumeSecretEasterEgg,
-  requestSecretSelfie,
-} from "../../lib/secretEasterEgg";
-import { playCameraShutter } from "../../lib/sounds";
+  finishEasterEgg,
+  preloadAudio,
+  startEasterEgg,
+  stopAudio,
+  stopEasterEgg,
+} from "../../lib/easterEggs";
+import { requestSecretSelfie } from "../../lib/secretEasterEgg";
 import Button from "../Shared/Button";
 import Section from "../Shared/Section";
 
-function wait(duration: number) {
-  return new Promise((resolve) => {
-    window.setTimeout(resolve, duration);
-  });
-}
+const PHOTOS_EASTER_EGG_ID = "photos";
+const SHUTTER_AUDIO_URL = `${import.meta.env.BASE_URL}audio/shutter.mp3`;
 
 export default function Photos() {
-  const tapTimes = useRef<number[]>([]);
-  const isSecretRunning = useRef(false);
+  const timers = useRef<number[]>([]);
+  const shutterAudio = useRef<HTMLAudioElement | undefined>(undefined);
   const [isTitlePressed, setIsTitlePressed] = useState(false);
   const [showFlash, setShowFlash] = useState(false);
   const [showThumbnail, setShowThumbnail] = useState(false);
@@ -26,33 +26,114 @@ export default function Photos() {
     ? wedding.photos.galleryUrl || undefined
     : undefined;
 
-  const handleTitleTap = async () => {
-    const now = Date.now();
-    tapTimes.current = [...tapTimes.current, now].filter(
-      (tapTime) => now - tapTime <= 3000,
-    );
+  const resetPhotosSecret = () => {
+    timers.current.forEach((timer) => window.clearTimeout(timer));
+    timers.current = [];
 
-    if (
-      tapTimes.current.length >= 3 &&
-      !isSecretRunning.current &&
-      consumeSecretEasterEgg()
-    ) {
-      isSecretRunning.current = true;
-      tapTimes.current = [];
-      setIsTitlePressed(true);
-      await wait(200);
-      setIsTitlePressed(false);
-
-      playCameraShutter();
-      setShowFlash(true);
-      window.setTimeout(() => setShowFlash(false), 150);
-
-      setShowThumbnail(true);
-      await wait(320);
-      setShowThumbnail(false);
-      requestSecretSelfie();
+    if (shutterAudio.current) {
+      shutterAudio.current.onended = null;
+      stopAudio(shutterAudio.current);
     }
+
+    setIsTitlePressed(false);
+    setShowFlash(false);
+    setShowThumbnail(false);
   };
+
+  useEffect(() => {
+    shutterAudio.current = preloadAudio(SHUTTER_AUDIO_URL);
+
+    return () => {
+      stopEasterEgg(PHOTOS_EASTER_EGG_ID);
+
+      if (shutterAudio.current) {
+        shutterAudio.current.onended = null;
+        stopAudio(shutterAudio.current);
+      }
+    };
+  }, []);
+
+  const handleTitleTap = () => {
+    startEasterEgg(PHOTOS_EASTER_EGG_ID, () => {
+      resetPhotosSecret();
+
+      const audio = shutterAudio.current ?? preloadAudio(SHUTTER_AUDIO_URL);
+
+      shutterAudio.current = audio;
+      audio.currentTime = 0;
+      audio.onended = () => {
+        setShowFlash(false);
+        setShowThumbnail(false);
+        finishEasterEgg(PHOTOS_EASTER_EGG_ID);
+        requestSecretSelfie();
+      };
+
+      void audio
+        .play()
+        .then(() => {
+          setIsTitlePressed(true);
+          setShowFlash(true);
+          setShowThumbnail(true);
+        })
+        .catch(() => {
+          stopAudio(audio);
+          finishEasterEgg(PHOTOS_EASTER_EGG_ID);
+        });
+
+      return resetPhotosSecret;
+    });
+  };
+
+  const closePhotosSecret = useCallback(() => {
+    timers.current.forEach((timer) => window.clearTimeout(timer));
+    timers.current = [];
+
+    if (shutterAudio.current) {
+      shutterAudio.current.onended = null;
+      stopAudio(shutterAudio.current);
+    }
+
+    setIsTitlePressed(false);
+    setShowFlash(false);
+    setShowThumbnail(false);
+    finishEasterEgg(PHOTOS_EASTER_EGG_ID);
+  }, []);
+
+  useEffect(() => {
+    if (!showThumbnail) {
+      return;
+    }
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        closePhotosSecret();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [showThumbnail, closePhotosSecret]);
+
+  useEffect(() => {
+    if (!isTitlePressed) {
+      return;
+    }
+
+    const timer = window.setTimeout(() => setIsTitlePressed(false), 200);
+
+    return () => window.clearTimeout(timer);
+  }, [isTitlePressed]);
+
+  useEffect(() => {
+    if (!showFlash) {
+      return;
+    }
+
+    const timer = window.setTimeout(() => setShowFlash(false), 150);
+
+    return () => window.clearTimeout(timer);
+  }, [showFlash]);
   const uploadUrl = wedding.photos.isEnabled
     ? wedding.photos.uploadUrl || undefined
     : undefined;
@@ -146,6 +227,14 @@ export default function Photos() {
       </div>
       {showFlash && (
         <div className="animate-photo-secret-flash pointer-events-none fixed inset-0 z-50 bg-white" />
+      )}
+      {showThumbnail && (
+        <button
+          type="button"
+          className="fixed inset-0 z-[49] cursor-default bg-transparent"
+          aria-label="Close photos Easter egg"
+          onClick={closePhotosSecret}
+        />
       )}
       {showThumbnail && (
         <div className="animate-camera-thumbnail pointer-events-none fixed bottom-[max(1rem,env(safe-area-inset-bottom))] left-4 z-50 h-16 w-16 overflow-hidden rounded-2xl border border-white/70 bg-white shadow-[0_12px_30px_rgba(0,0,0,0.18)]">

@@ -1,22 +1,37 @@
 import { useEffect, useRef, useState } from "react";
 import illustration from "../../assets/illustrations/hero.webp";
 import selfie from "../../assets/illustrations/bears-selfie-love.webp";
+import {
+  finishEasterEgg,
+  startEasterEgg,
+  stopEasterEgg,
+} from "../../lib/easterEggs";
 import { playWeddingChime } from "../../lib/sounds";
+import EasterEggOverlay from "../Shared/EasterEggOverlay";
 
 type SecretState = "idle" | "selfie" | "return";
 
-function wait(duration: number) {
-  return new Promise((resolve) => {
-    window.setTimeout(resolve, duration);
-  });
-}
+const HERO_CHIME_EASTER_EGG_ID = "hero-chime";
+const HERO_SELFIE_EASTER_EGG_ID = "hero-selfie";
 
 export default function HeroIllustration() {
   const rootRef = useRef<HTMLDivElement>(null);
-  const isSecretRunning = useRef(false);
+  const secretTimers = useRef<number[]>([]);
   const [showEasterEgg, setShowEasterEgg] = useState(false);
   const [secretState, setSecretState] = useState<SecretState>("idle");
   const [showFinalShimmer, setShowFinalShimmer] = useState(false);
+
+  const resetSecretSelfie = () => {
+    secretTimers.current.forEach((timer) => window.clearTimeout(timer));
+    secretTimers.current = [];
+    setSecretState("idle");
+    setShowFinalShimmer(false);
+  };
+
+  const closeSecretSelfie = () => {
+    resetSecretSelfie();
+    finishEasterEgg(HERO_SELFIE_EASTER_EGG_ID);
+  };
 
   useEffect(() => {
     let endTimer: number | undefined;
@@ -38,39 +53,52 @@ export default function HeroIllustration() {
   }, []);
 
   useEffect(() => {
-    const runSecretSelfie = async () => {
-      if (isSecretRunning.current) {
-        return;
-      }
+    const runSecretSelfie = () => {
+      startEasterEgg(HERO_SELFIE_EASTER_EGG_ID, () => {
+        resetSecretSelfie();
+        rootRef.current?.closest("section")?.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
 
-      isSecretRunning.current = true;
-      rootRef.current?.closest("section")?.scrollIntoView({
-        behavior: "smooth",
-        block: "start",
+        secretTimers.current.push(
+          window.setTimeout(() => setSecretState("selfie"), 1000),
+          window.setTimeout(() => setSecretState("return"), 11000),
+          window.setTimeout(() => {
+            setSecretState("idle");
+            setShowFinalShimmer(true);
+          }, 11520),
+          window.setTimeout(() => {
+            setShowFinalShimmer(false);
+            finishEasterEgg(HERO_SELFIE_EASTER_EGG_ID);
+          }, 12220),
+        );
+
+        return resetSecretSelfie;
       });
-      await wait(1000);
-
-      setSecretState("selfie");
-      await wait(10000);
-
-      setSecretState("return");
-      await wait(520);
-
-      setSecretState("idle");
-      setShowFinalShimmer(true);
-      await wait(700);
-
-      setShowFinalShimmer(false);
-      isSecretRunning.current = false;
     };
 
     window.addEventListener("secret-selfie", runSecretSelfie);
 
-    return () => window.removeEventListener("secret-selfie", runSecretSelfie);
+    return () => {
+      window.removeEventListener("secret-selfie", runSecretSelfie);
+      stopEasterEgg(HERO_SELFIE_EASTER_EGG_ID);
+    };
   }, []);
 
   const handleHeartClick = () => {
-    playWeddingChime();
+    startEasterEgg(HERO_CHIME_EASTER_EGG_ID, () => {
+      const stopChime = playWeddingChime();
+      const timer = window.setTimeout(
+        () => finishEasterEgg(HERO_CHIME_EASTER_EGG_ID),
+        900,
+      );
+
+      return () => {
+        window.clearTimeout(timer);
+        stopChime();
+      };
+    });
   };
 
   return (
@@ -191,26 +219,25 @@ export default function HeroIllustration() {
         <img
           src={illustration}
           alt=""
-          className={`h-auto w-full select-none drop-shadow-[0_18px_38px_rgba(0,0,0,0.055)] pointer-events-none transition-opacity duration-500 ${
-            secretState === "selfie" ? "opacity-0" : "opacity-100"
-          }`}
+          className="pointer-events-none h-auto w-full select-none drop-shadow-[0_18px_38px_rgba(0,0,0,0.055)]"
           loading="eager"
           draggable={false}
         />
-        <div
-          className={`pointer-events-none absolute inset-0 flex items-center justify-center transition-opacity duration-500 ${
-            secretState === "selfie" ? "opacity-100" : "opacity-0"
-          }`}
+        <div className="pointer-events-none absolute bottom-0 left-1/2 h-[16px] w-[58%] -translate-x-1/2 rounded-full bg-black/[0.045] blur-lg" />
+      </div>
+      {secretState !== "idle" && (
+        <EasterEggOverlay
+          ariaLabel="Close selfie Easter egg"
+          onClose={closeSecretSelfie}
         >
           <img
             src={selfie}
             alt=""
-            className="h-auto w-full select-none drop-shadow-[0_18px_38px_rgba(0,0,0,0.055)]"
+            className="h-auto max-h-[90vh] w-[min(90vw,420px)] select-none object-contain drop-shadow-[0_18px_38px_rgba(0,0,0,0.055)]"
             draggable={false}
           />
-        </div>
-        <div className="pointer-events-none absolute bottom-0 left-1/2 h-[16px] w-[58%] -translate-x-1/2 rounded-full bg-black/[0.045] blur-lg" />
-      </div>
+        </EasterEggOverlay>
+      )}
     </>
   );
 }

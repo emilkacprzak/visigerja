@@ -1,14 +1,20 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import dancingBears from "../../assets/illustrations/bears-dancing.webp";
 import goodbyeBears from "../../assets/illustrations/bears-goodbye.webp";
 import { wedding } from "../../data/wedding";
-import { playGoodbyeWave, playRainbowDisco } from "../../lib/sounds";
+import {
+  finishEasterEgg,
+  preloadAudio,
+  startEasterEgg,
+  stopAudio,
+  stopEasterEgg,
+} from "../../lib/easterEggs";
+import { playGoodbyeWave } from "../../lib/sounds";
+import EasterEggOverlay from "../Shared/EasterEggOverlay";
 
-function wait(duration: number) {
-  return new Promise((resolve) => {
-    window.setTimeout(resolve, duration);
-  });
-}
+const FOOTER_DANCE_EASTER_EGG_ID = "footer-dance";
+const FOOTER_GOODBYE_EASTER_EGG_ID = "footer-goodbye";
+const HEART_EASTER_EGG_AUDIO_URL = `${import.meta.env.BASE_URL}audio/jbie-mono-fade.mp3`;
 
 export default function Footer() {
   const [showPrideEffect, setShowPrideEffect] = useState(false);
@@ -17,82 +23,156 @@ export default function Footer() {
   const [isDanceExiting, setIsDanceExiting] = useState(false);
   const [showGoodbyeOverlay, setShowGoodbyeOverlay] = useState(false);
   const [isGoodbyeExiting, setIsGoodbyeExiting] = useState(false);
-  const tapTimes = useRef<number[]>([]);
-  const goodbyeTapTimes = useRef<number[]>([]);
-  const hasDancePlayed = useRef(false);
-  const hasGoodbyePlayed = useRef(false);
-  const isDanceRunning = useRef(false);
-  const isGoodbyeRunning = useRef(false);
+  const danceTimers = useRef<number[]>([]);
+  const goodbyeTimers = useRef<number[]>([]);
+  const danceAudio = useRef<HTMLAudioElement | undefined>(undefined);
   const stopGoodbyeSound = useRef<(() => void) | undefined>(undefined);
   const coupleNames = `${wedding.couple.partner1} & ${wedding.couple.partner2}`;
 
-  const runDanceSecret = async () => {
-    if (hasDancePlayed.current || isDanceRunning.current) {
-      return;
+  const resetDanceSecret = () => {
+    danceTimers.current.forEach((timer) => window.clearTimeout(timer));
+    danceTimers.current = [];
+
+    if (danceAudio.current) {
+      danceAudio.current.onended = null;
+      stopAudio(danceAudio.current);
     }
 
-    hasDancePlayed.current = true;
-    isDanceRunning.current = true;
-    setShowDanceRipple(true);
-    await wait(300);
+    setShowPrideEffect(false);
     setShowDanceRipple(false);
-    playRainbowDisco();
-    setShowDanceOverlay(true);
-    await wait(10000);
-    setIsDanceExiting(true);
-    await wait(400);
     setShowDanceOverlay(false);
     setIsDanceExiting(false);
-    isDanceRunning.current = false;
+  };
+
+  const resetGoodbyeSecret = () => {
+    goodbyeTimers.current.forEach((timer) => window.clearTimeout(timer));
+    goodbyeTimers.current = [];
+    stopGoodbyeSound.current?.();
+    stopGoodbyeSound.current = undefined;
+    setShowGoodbyeOverlay(false);
+    setIsGoodbyeExiting(false);
+  };
+
+  useEffect(() => {
+    danceAudio.current = preloadAudio(HEART_EASTER_EGG_AUDIO_URL);
+
+    return () => {
+      stopEasterEgg(FOOTER_DANCE_EASTER_EGG_ID);
+      stopEasterEgg(FOOTER_GOODBYE_EASTER_EGG_ID);
+
+      if (danceAudio.current) {
+        danceAudio.current.onended = null;
+        stopAudio(danceAudio.current);
+      }
+    };
+  }, []);
+
+  const runDanceSecret = () => {
+    startEasterEgg(FOOTER_DANCE_EASTER_EGG_ID, () => {
+      resetDanceSecret();
+      setShowDanceRipple(true);
+      setShowPrideEffect(true);
+
+      const audio = danceAudio.current ?? preloadAudio(HEART_EASTER_EGG_AUDIO_URL);
+
+      danceAudio.current = audio;
+      audio.currentTime = 0;
+      audio.onended = closeDanceSecret;
+
+      void audio
+        .play()
+        .then(() => {
+          setShowDanceOverlay(true);
+        })
+        .catch(() => {
+          stopAudio(audio);
+          finishEasterEgg(FOOTER_DANCE_EASTER_EGG_ID);
+        });
+
+      danceTimers.current.push(
+        window.setTimeout(() => setShowDanceRipple(false), 300),
+        window.setTimeout(() => setShowPrideEffect(false), 2000),
+      );
+
+      return resetDanceSecret;
+    });
   };
 
   const handleHeartClick = () => {
-    const now = Date.now();
-
-    playRainbowDisco();
-    setShowPrideEffect(true);
-    window.setTimeout(() => setShowPrideEffect(false), 2000);
-
-    tapTimes.current = [...tapTimes.current, now].filter(
-      (tapTime) => now - tapTime <= 3000,
-    );
-
-    if (tapTimes.current.length >= 3) {
-      tapTimes.current = [];
-      void runDanceSecret();
-    }
+    runDanceSecret();
   };
 
-  const runGoodbyeSecret = async () => {
-    if (hasGoodbyePlayed.current || isGoodbyeRunning.current) {
+  const closeDanceSecret = () => {
+    if (isDanceExiting) {
       return;
     }
 
-    hasGoodbyePlayed.current = true;
-    isGoodbyeRunning.current = true;
-    stopGoodbyeSound.current = playGoodbyeWave();
-    setShowGoodbyeOverlay(true);
-    await wait(10000);
-    setIsGoodbyeExiting(true);
-    stopGoodbyeSound.current?.();
-    await wait(500);
-    setShowGoodbyeOverlay(false);
-    setIsGoodbyeExiting(false);
-    stopGoodbyeSound.current = undefined;
-    isGoodbyeRunning.current = false;
+    danceTimers.current.forEach((timer) => window.clearTimeout(timer));
+    danceTimers.current = [];
+
+    if (danceAudio.current) {
+      danceAudio.current.onended = null;
+      stopAudio(danceAudio.current);
+    }
+
+    setShowPrideEffect(false);
+    setShowDanceRipple(false);
+    setIsDanceExiting(true);
+
+    danceTimers.current.push(
+      window.setTimeout(() => {
+        setShowDanceOverlay(false);
+        setIsDanceExiting(false);
+        finishEasterEgg(FOOTER_DANCE_EASTER_EGG_ID);
+      }, 400),
+    );
+  };
+
+  const runGoodbyeSecret = () => {
+    startEasterEgg(FOOTER_GOODBYE_EASTER_EGG_ID, () => {
+      resetGoodbyeSecret();
+      stopGoodbyeSound.current = playGoodbyeWave();
+      setShowGoodbyeOverlay(true);
+
+      goodbyeTimers.current.push(
+        window.setTimeout(() => {
+          setIsGoodbyeExiting(true);
+          stopGoodbyeSound.current?.();
+          stopGoodbyeSound.current = undefined;
+        }, 10000),
+        window.setTimeout(() => {
+          setShowGoodbyeOverlay(false);
+          setIsGoodbyeExiting(false);
+          finishEasterEgg(FOOTER_GOODBYE_EASTER_EGG_ID);
+        }, 10500),
+      );
+
+      return resetGoodbyeSecret;
+    });
   };
 
   const handleGoodbyeClick = () => {
-    const now = Date.now();
+    runGoodbyeSecret();
+  };
 
-    goodbyeTapTimes.current = [...goodbyeTapTimes.current, now].filter(
-      (tapTime) => now - tapTime <= 3000,
-    );
-
-    if (goodbyeTapTimes.current.length >= 3) {
-      goodbyeTapTimes.current = [];
-      void runGoodbyeSecret();
+  const closeGoodbyeSecret = () => {
+    if (isGoodbyeExiting) {
+      return;
     }
+
+    goodbyeTimers.current.forEach((timer) => window.clearTimeout(timer));
+    goodbyeTimers.current = [];
+    stopGoodbyeSound.current?.();
+    stopGoodbyeSound.current = undefined;
+    setIsGoodbyeExiting(true);
+
+    goodbyeTimers.current.push(
+      window.setTimeout(() => {
+        setShowGoodbyeOverlay(false);
+        setIsGoodbyeExiting(false);
+        finishEasterEgg(FOOTER_GOODBYE_EASTER_EGG_ID);
+      }, 500),
+    );
   };
 
   return (
@@ -384,12 +464,12 @@ export default function Footer() {
         </p>
       </div>
       {showDanceOverlay && (
-        <div
-          className={`pointer-events-none fixed left-1/2 top-1/2 z-50 w-[min(84vw,360px)] ${
-            isDanceExiting ? "dancing-bears-exit" : "dancing-bears-enter"
-          }`}
+        <EasterEggOverlay
+          ariaLabel="Close dance Easter egg"
+          isExiting={isDanceExiting}
+          onClose={closeDanceSecret}
         >
-          <div className="relative">
+          <div className="relative w-[min(90vw,360px)] max-h-[90vh]">
             <span className="dance-sparkle absolute -left-2 top-8 text-[10px] leading-none text-[#E40303]">
               ✦
             </span>
@@ -405,25 +485,25 @@ export default function Footer() {
             <img
               src={dancingBears}
               alt=""
-              className="dancing-bears-groove h-auto w-full select-none drop-shadow-[0_24px_55px_rgba(0,0,0,0.12)]"
+              className="dancing-bears-groove h-auto max-h-[90vh] w-full select-none object-contain drop-shadow-[0_24px_55px_rgba(0,0,0,0.12)]"
               draggable={false}
             />
           </div>
-        </div>
+        </EasterEggOverlay>
       )}
       {showGoodbyeOverlay && (
-        <div
-          className={`pointer-events-none fixed left-1/2 top-1/2 z-50 w-[min(84vw,360px)] ${
-            isGoodbyeExiting ? "goodbye-bears-exit" : "goodbye-bears-enter"
-          }`}
+        <EasterEggOverlay
+          ariaLabel="Close goodbye Easter egg"
+          isExiting={isGoodbyeExiting}
+          onClose={closeGoodbyeSecret}
         >
           <img
             src={goodbyeBears}
             alt=""
-            className="goodbye-wave h-auto w-full select-none drop-shadow-[0_26px_60px_rgba(0,0,0,0.12)]"
+            className="goodbye-wave h-auto max-h-[90vh] w-[min(90vw,360px)] select-none object-contain drop-shadow-[0_26px_60px_rgba(0,0,0,0.12)]"
             draggable={false}
           />
-        </div>
+        </EasterEggOverlay>
       )}
     </footer>
   );

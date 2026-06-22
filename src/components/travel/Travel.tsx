@@ -3,9 +3,23 @@ import { Hotel, Plane } from "lucide-react";
 import hotelSleepEasterEgg from "../../assets/illustrations/bears-hotel-sleep-easter-egg.webp";
 import planeEasterEgg from "../../assets/illustrations/bears-plane-easter-egg.webp";
 import travelEasterEgg from "../../assets/illustrations/bears-travel-easter-egg.webp";
-import { playAirplaneTakeoff } from "../../lib/sounds";
+import {
+  finishEasterEgg,
+  preloadAudio,
+  startEasterEgg,
+  stopAudio,
+  stopEasterEgg,
+} from "../../lib/easterEggs";
 import Button from "../Shared/Button";
+import EasterEggOverlay from "../Shared/EasterEggOverlay";
 import Section from "../Shared/Section";
+
+const TRAVEL_EASTER_EGG_ID = "travel";
+const FLIGHT_EASTER_EGG_ID = "flight";
+const HOTEL_EASTER_EGG_ID = "hotel";
+const TRAVEL_AUDIO_URL = `${import.meta.env.BASE_URL}audio/travel-plane-web.mp3`;
+const FLIGHT_AUDIO_URL = `${import.meta.env.BASE_URL}audio/plane-takeoff-web-10s-fade.mp3`;
+const SNORING_AUDIO_URL = `${import.meta.env.BASE_URL}audio/bears-snoring-web.mp3`;
 
 const cards = [
   {
@@ -25,16 +39,13 @@ const cards = [
 ];
 
 export default function Travel() {
-  const travelTapTimes = useRef<number[]>([]);
-  const tapTimes = useRef<number[]>([]);
-  const hasTravelPlayed = useRef(false);
-  const hasPlayed = useRef(false);
-  const hotelTapTimes = useRef<number[]>([]);
-  const hasHotelPlayed = useRef(false);
   const travelAudio = useRef<HTMLAudioElement | undefined>(undefined);
+  const flightAudio = useRef<HTMLAudioElement | undefined>(undefined);
   const travelSecretTimers = useRef<number[]>([]);
   const snoringAudio = useRef<HTMLAudioElement | undefined>(undefined);
   const snoringFadeTimer = useRef<number | undefined>(undefined);
+  const planeTimers = useRef<number[]>([]);
+  const hotelTimers = useRef<number[]>([]);
   const [showPlane, setShowPlane] = useState(false);
   const [showTravelSecret, setShowTravelSecret] = useState(false);
   const [isTravelSecretLeaving, setIsTravelSecretLeaving] = useState(false);
@@ -71,14 +82,10 @@ export default function Travel() {
   };
 
   const startSnoring = () => {
-    if (snoringAudio.current) {
-      return;
-    }
+    clearSnoringFade();
 
-    const audioUrl = `${import.meta.env.BASE_URL}audio/bears-snoring-web.mp3`;
-    const audio = new Audio(audioUrl);
+    const audio = snoringAudio.current ?? preloadAudio(SNORING_AUDIO_URL);
 
-    audio.preload = "auto";
     audio.volume = 0.01;
     audio.loop = true;
     snoringAudio.current = audio;
@@ -88,11 +95,8 @@ export default function Travel() {
       .then(() => {
         fadeSnoringVolume(audio, 0.8, 300);
       })
-      .catch((error) => {
-        console.warn("Snoring audio blocked:", error);
-        audio.pause();
-        audio.currentTime = 0;
-        snoringAudio.current = undefined;
+      .catch(() => {
+        stopAudio(audio);
       });
   };
 
@@ -110,126 +114,210 @@ export default function Travel() {
     });
   };
 
+  const resetTravelSecret = () => {
+    travelSecretTimers.current.forEach((timer) => window.clearTimeout(timer));
+    travelSecretTimers.current = [];
+
+    if (travelAudio.current) {
+      stopAudio(travelAudio.current);
+    }
+
+    setShowTravelSecret(false);
+    setIsTravelSecretLeaving(false);
+  };
+
+  const resetPlaneSecret = () => {
+    planeTimers.current.forEach((timer) => window.clearTimeout(timer));
+    planeTimers.current = [];
+
+    if (flightAudio.current) {
+      stopAudio(flightAudio.current);
+    }
+
+    setShowPlane(false);
+  };
+
+  const resetHotelSecret = () => {
+    hotelTimers.current.forEach((timer) => window.clearTimeout(timer));
+    hotelTimers.current = [];
+    clearSnoringFade();
+
+    if (snoringAudio.current) {
+      stopAudio(snoringAudio.current);
+    }
+
+    setShowHotelSleep(false);
+    setIsHotelSleepLeaving(false);
+  };
+
   useEffect(() => {
+    travelAudio.current = preloadAudio(TRAVEL_AUDIO_URL);
+    flightAudio.current = preloadAudio(FLIGHT_AUDIO_URL);
+    snoringAudio.current = preloadAudio(SNORING_AUDIO_URL);
+    snoringAudio.current.loop = true;
+
     return () => {
+      stopEasterEgg(TRAVEL_EASTER_EGG_ID);
+      stopEasterEgg(FLIGHT_EASTER_EGG_ID);
+      stopEasterEgg(HOTEL_EASTER_EGG_ID);
       travelSecretTimers.current.forEach((timer) => window.clearTimeout(timer));
-      travelSecretTimers.current = [];
+      planeTimers.current.forEach((timer) => window.clearTimeout(timer));
+      hotelTimers.current.forEach((timer) => window.clearTimeout(timer));
       clearSnoringFade();
 
-      if (snoringAudio.current) {
-        snoringAudio.current.pause();
-        snoringAudio.current.currentTime = 0;
-        snoringAudio.current = undefined;
+      if (travelAudio.current) {
+        stopAudio(travelAudio.current);
       }
 
-      if (travelAudio.current) {
-        travelAudio.current.pause();
-        travelAudio.current.currentTime = 0;
-        travelAudio.current = undefined;
+      if (flightAudio.current) {
+        stopAudio(flightAudio.current);
+      }
+
+      if (snoringAudio.current) {
+        stopAudio(snoringAudio.current);
       }
     };
   }, []);
 
-  const handleTravelTitleTap = async () => {
-    if (hasTravelPlayed.current) {
+  const handleTravelTitleTap = () => {
+    startEasterEgg(TRAVEL_EASTER_EGG_ID, () => {
+      resetTravelSecret();
+
+      const audio = travelAudio.current ?? preloadAudio(TRAVEL_AUDIO_URL);
+
+      travelAudio.current = audio;
+      audio.volume = 0.8;
+      void audio
+        .play()
+        .then(() => {
+          setShowTravelSecret(true);
+
+          travelSecretTimers.current.push(
+            window.setTimeout(() => {
+              setIsTravelSecretLeaving(true);
+            }, 10000),
+          );
+
+          travelSecretTimers.current.push(
+            window.setTimeout(() => {
+              stopAudio(audio);
+              setShowTravelSecret(false);
+              setIsTravelSecretLeaving(false);
+              finishEasterEgg(TRAVEL_EASTER_EGG_ID);
+            }, 10400),
+          );
+        })
+        .catch(() => {
+          stopAudio(audio);
+          finishEasterEgg(TRAVEL_EASTER_EGG_ID);
+        });
+
+      return resetTravelSecret;
+    });
+  };
+
+  const closeTravelSecret = () => {
+    if (isTravelSecretLeaving) {
       return;
     }
 
-    const now = Date.now();
-    travelTapTimes.current = [...travelTapTimes.current, now].filter(
-      (tapTime) => now - tapTime <= 3000,
-    );
+    travelSecretTimers.current.forEach((timer) => window.clearTimeout(timer));
+    travelSecretTimers.current = [];
+    setIsTravelSecretLeaving(true);
 
-    if (travelTapTimes.current.length >= 3) {
-      hasTravelPlayed.current = true;
-      travelTapTimes.current = [];
-
-      const audio = new Audio(
-        `${import.meta.env.BASE_URL}audio/travel-plane-web.mp3`,
-      );
-
-      audio.preload = "auto";
-      audio.volume = 0.8;
-      travelAudio.current = audio;
-
-      try {
-        await audio.play();
-      } catch (error) {
-        console.warn("Travel audio blocked:", error);
-      }
-
-      travelSecretTimers.current.push(
-        window.setTimeout(() => {
-          setShowTravelSecret(true);
-        }, 300),
-      );
-
-      travelSecretTimers.current.push(
-        window.setTimeout(() => {
-          setIsTravelSecretLeaving(true);
-        }, 10300),
-      );
-
-      travelSecretTimers.current.push(
-        window.setTimeout(() => {
-          audio.pause();
-          audio.currentTime = 0;
-
-          if (travelAudio.current === audio) {
-            travelAudio.current = undefined;
-          }
-
-          setShowTravelSecret(false);
-          setIsTravelSecretLeaving(false);
-        }, 10700),
-      );
+    if (travelAudio.current) {
+      stopAudio(travelAudio.current);
     }
+
+    travelSecretTimers.current.push(
+      window.setTimeout(() => {
+        setShowTravelSecret(false);
+        setIsTravelSecretLeaving(false);
+        finishEasterEgg(TRAVEL_EASTER_EGG_ID);
+      }, 400),
+    );
   };
 
   const handleTitleTap = () => {
-    if (hasPlayed.current) {
-      return;
+    startEasterEgg(FLIGHT_EASTER_EGG_ID, () => {
+      resetPlaneSecret();
+
+      const audio = flightAudio.current ?? preloadAudio(FLIGHT_AUDIO_URL);
+
+      flightAudio.current = audio;
+      audio.volume = 0.8;
+      void audio
+        .play()
+        .then(() => {
+          setShowPlane(true);
+
+          planeTimers.current.push(
+            window.setTimeout(() => {
+              stopAudio(audio);
+              setShowPlane(false);
+              finishEasterEgg(FLIGHT_EASTER_EGG_ID);
+            }, 9800),
+          );
+        })
+        .catch(() => {
+          stopAudio(audio);
+          finishEasterEgg(FLIGHT_EASTER_EGG_ID);
+        });
+
+      return resetPlaneSecret;
+    });
+  };
+
+  const closePlaneSecret = () => {
+    planeTimers.current.forEach((timer) => window.clearTimeout(timer));
+    planeTimers.current = [];
+
+    if (flightAudio.current) {
+      stopAudio(flightAudio.current);
     }
 
-    const now = Date.now();
-    tapTimes.current = [...tapTimes.current, now].filter(
-      (tapTime) => now - tapTime <= 3000,
-    );
-
-    if (tapTimes.current.length >= 3) {
-      hasPlayed.current = true;
-      setShowPlane(true);
-      playAirplaneTakeoff();
-
-      window.setTimeout(() => {
-        setShowPlane(false);
-      }, 9800);
-    }
+    setShowPlane(false);
+    finishEasterEgg(FLIGHT_EASTER_EGG_ID);
   };
 
   const handleHotelTitleTap = () => {
-    if (hasHotelPlayed.current) {
+    startEasterEgg(HOTEL_EASTER_EGG_ID, () => {
+      resetHotelSecret();
+      startSnoring();
+      setShowHotelSleep(true);
+      hotelTimers.current.push(
+        window.setTimeout(() => {
+          setIsHotelSleepLeaving(true);
+          stopSnoring();
+        }, 10000),
+        window.setTimeout(() => {
+          setShowHotelSleep(false);
+          setIsHotelSleepLeaving(false);
+          finishEasterEgg(HOTEL_EASTER_EGG_ID);
+        }, 10400),
+      );
+
+      return resetHotelSecret;
+    });
+  };
+
+  const closeHotelSecret = () => {
+    if (isHotelSleepLeaving) {
       return;
     }
 
-    const now = Date.now();
-    hotelTapTimes.current = [...hotelTapTimes.current, now].filter(
-      (tapTime) => now - tapTime <= 3000,
-    );
+    hotelTimers.current.forEach((timer) => window.clearTimeout(timer));
+    hotelTimers.current = [];
+    setIsHotelSleepLeaving(true);
+    stopSnoring();
 
-    if (hotelTapTimes.current.length >= 3) {
-      hasHotelPlayed.current = true;
-      startSnoring();
-      setShowHotelSleep(true);
-      window.setTimeout(() => {
-        setIsHotelSleepLeaving(true);
-        stopSnoring();
-      }, 10000);
+    hotelTimers.current.push(
       window.setTimeout(() => {
         setShowHotelSleep(false);
         setIsHotelSleepLeaving(false);
-      }, 10400);
-    }
+        finishEasterEgg(HOTEL_EASTER_EGG_ID);
+      }, 400),
+    );
   };
 
   return (
@@ -367,36 +455,55 @@ export default function Travel() {
       </style>
 
       {showPlane && (
-        <div className="pointer-events-none fixed inset-0 z-[9999] overflow-hidden">
+        <EasterEggOverlay
+          ariaLabel="Close flight Easter egg"
+          className="overflow-hidden bg-transparent backdrop-blur-0"
+          onClose={closePlaneSecret}
+        >
           <div className="travel-plane-flight absolute left-1/2 top-0 w-[220px]">
             <div className="travel-plane-bob relative">
               <img
                 src={planeEasterEgg}
                 alt=""
-                className="h-auto w-full select-none drop-shadow-[0_18px_38px_rgba(0,0,0,0.12)]"
+                className="h-auto max-h-[90vh] w-full select-none object-contain drop-shadow-[0_18px_38px_rgba(0,0,0,0.12)]"
                 draggable={false}
               />
               <div className="travel-plane-heart-shimmer absolute left-[55%] top-[35%] h-14 w-14 rounded-full bg-[#D4AF37]/25 blur-xl" />
             </div>
           </div>
-        </div>
+        </EasterEggOverlay>
       )}
 
       {showTravelSecret && (
-        <div
-          className={`pointer-events-none fixed left-1/2 top-1/2 z-[9999] w-[min(86vw,380px)] ${
-            isTravelSecretLeaving ? "travel-secret-exit" : "travel-secret-enter"
-          }`}
+        <EasterEggOverlay
+          ariaLabel="Close travel Easter egg"
+          isExiting={isTravelSecretLeaving}
+          onClose={closeTravelSecret}
         >
-          <div className="travel-secret-float">
+          <div className="travel-secret-float w-[min(90vw,380px)] max-h-[90vh]">
             <img
               src={travelEasterEgg}
               alt=""
-              className="travel-suitcase-bounce h-auto w-full select-none drop-shadow-[0_26px_60px_rgba(0,0,0,0.14)]"
+              className="travel-suitcase-bounce h-auto max-h-[90vh] w-full select-none object-contain drop-shadow-[0_26px_60px_rgba(0,0,0,0.14)]"
               draggable={false}
             />
           </div>
-        </div>
+        </EasterEggOverlay>
+      )}
+
+      {showHotelSleep && (
+        <EasterEggOverlay
+          ariaLabel="Close hotel Easter egg"
+          isExiting={isHotelSleepLeaving}
+          onClose={closeHotelSecret}
+        >
+          <img
+            src={hotelSleepEasterEgg}
+            alt=""
+            className="hotel-sleep-float h-auto max-h-[90vh] w-[min(90vw,360px)] select-none rounded-3xl object-contain shadow-[0_18px_50px_rgba(0,0,0,0.12)]"
+            draggable={false}
+          />
+        </EasterEggOverlay>
       )}
 
       <Section id="travel">
@@ -415,20 +522,6 @@ export default function Travel() {
                 id={card.title === "Accommodation" ? "accommodation" : undefined}
                 className="relative rounded-3xl border border-stone-200 bg-white/70 p-6 text-center shadow-[0_18px_50px_rgba(0,0,0,0.06)] backdrop-blur-xl"
               >
-                {card.title === "Accommodation" && showHotelSleep && (
-                  <div
-                    className={`pointer-events-none absolute inset-0 z-20 flex items-center justify-center transition-opacity duration-400 ${
-                      isHotelSleepLeaving ? "opacity-0" : "opacity-100"
-                    }`}
-                  >
-                    <img
-                      src={hotelSleepEasterEgg}
-                      alt=""
-                      className="hotel-sleep-float w-[86%] select-none rounded-3xl shadow-[0_18px_50px_rgba(0,0,0,0.12)]"
-                      draggable={false}
-                    />
-                  </div>
-                )}
                 <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-stone-100 text-stone-700">
                   {card.icon}
                 </div>

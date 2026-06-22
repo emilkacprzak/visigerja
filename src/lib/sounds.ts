@@ -93,7 +93,7 @@ export function playWeddingChime() {
   const context = getAudioContext();
 
   if (!context) {
-    return;
+    return () => {};
   }
 
   const now = context.currentTime;
@@ -118,13 +118,21 @@ export function playWeddingChime() {
     duration: 0.48,
     volume: 0.055,
   });
+
+  return () => {
+    const stopAt = context.currentTime + 0.16;
+
+    master.gain.cancelScheduledValues(context.currentTime);
+    master.gain.setValueAtTime(master.gain.value, context.currentTime);
+    master.gain.exponentialRampToValueAtTime(0.0001, stopAt);
+  };
 }
 
 export function playRainbowDisco() {
   const context = getAudioContext();
 
   if (!context) {
-    return;
+    return () => {};
   }
 
   const now = context.currentTime;
@@ -207,13 +215,21 @@ export function playRainbowDisco() {
       type: "triangle",
     });
   });
+
+  return () => {
+    const stopAt = context.currentTime + 0.18;
+
+    master.gain.cancelScheduledValues(context.currentTime);
+    master.gain.setValueAtTime(master.gain.value, context.currentTime);
+    master.gain.exponentialRampToValueAtTime(0.0001, stopAt);
+  };
 }
 
 export function playCameraShutter() {
   const context = getAudioContext();
 
   if (!context) {
-    return;
+    return () => {};
   }
 
   const now = context.currentTime;
@@ -249,6 +265,14 @@ export function playCameraShutter() {
     volume: 0.05,
     type: "triangle",
   });
+
+  return () => {
+    const stopAt = context.currentTime + 0.08;
+
+    master.gain.cancelScheduledValues(context.currentTime);
+    master.gain.setValueAtTime(master.gain.value, context.currentTime);
+    master.gain.exponentialRampToValueAtTime(0.0001, stopAt);
+  };
 }
 
 export function playCeremonyMusicBox() {
@@ -325,7 +349,7 @@ export function playAirplaneTakeoff() {
   const context = getAudioContext();
 
   if (!context) {
-    return;
+    return () => {};
   }
 
   const now = context.currentTime;
@@ -394,6 +418,14 @@ export function playAirplaneTakeoff() {
   engine.stop(now + 3.85);
   rumble.stop(now + 3.65);
   lift.stop(now + 3.8);
+
+  return () => {
+    const stopAt = context.currentTime + 0.18;
+
+    master.gain.cancelScheduledValues(context.currentTime);
+    master.gain.setValueAtTime(master.gain.value, context.currentTime);
+    master.gain.exponentialRampToValueAtTime(0.0001, stopAt);
+  };
 }
 
 export function playSleepLoop() {
