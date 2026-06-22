@@ -58,7 +58,7 @@ export default function Photos() {
     : undefined;
 
   return (
-    <Section>
+    <Section id="gallery">
       <style>
         {`
           @keyframes camera-thumbnail {
@@ -97,7 +97,7 @@ export default function Photos() {
           }
         `}
       </style>
-      <div className="mx-auto flex w-full max-w-[340px] flex-col items-center py-20 text-center">
+      <div className="mx-auto flex w-full max-w-[340px] flex-col items-center pb-20 pt-16 text-center">
         <article className="w-full rounded-3xl border border-stone-200 bg-white/70 p-6 text-center shadow-[0_18px_50px_rgba(0,0,0,0.06)] backdrop-blur-xl">
           <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-stone-100 text-stone-700">
             <Camera className="text-stone-700" size={26} strokeWidth={1.75} />

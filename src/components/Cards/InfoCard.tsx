@@ -6,6 +6,8 @@ interface InfoCardProps {
   icon: ReactNode;
   href?: string;
   disabled?: boolean;
+  rel?: string;
+  target?: string;
 }
 
 export default function InfoCard({
@@ -14,6 +16,8 @@ export default function InfoCard({
   icon,
   href,
   disabled = false,
+  rel,
+  target,
 }: InfoCardProps) {
   const className = `block rounded-3xl border border-stone-200 bg-white/70 p-6 backdrop-blur-xl transition-all duration-300 ${
     href && !disabled
@@ -36,7 +40,7 @@ export default function InfoCard({
 
   if (href && !disabled) {
     return (
-      <a href={href} className={className}>
+      <a href={href} target={target} rel={rel} className={className}>
         {content}
       </a>
     );

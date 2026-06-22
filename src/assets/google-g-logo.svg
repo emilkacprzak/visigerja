@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" aria-hidden="true">
+  <defs>
+    <linearGradient id="google-g-gradient" x1="7.5" x2="41" y1="7.5" y2="40.5" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#EA4335" />
+      <stop offset="0.33" stop-color="#FBBC04" />
+      <stop offset="0.58" stop-color="#34A853" />
+      <stop offset="0.82" stop-color="#4285F4" />
+    </linearGradient>
+  </defs>
+  <path
+    fill="url(#google-g-gradient)"
+    d="M43.611 20.083H42V20H24v8h11.303C33.652 32.657 29.223 36 24 36c-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 12.955 4 4 12.955 4 24s8.955 20 20 20 20-8.955 20-20c0-1.341-.138-2.65-.389-3.917Z"
+  />
+  <path
+    fill="#fff"
+    d="M24 20v8h11.303A12.02 12.02 0 0 1 24 36c-3.276 0-6.244-1.312-8.41-3.44l-5.668 5.668A19.925 19.925 0 0 0 24 44c11.045 0 20-8.955 20-20 0-1.341-.138-2.65-.389-3.917H24Z"
+    opacity=".03"
+  />
+</svg>

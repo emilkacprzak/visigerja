@@ -20,7 +20,7 @@ export default function Button({
   variant = "primary",
 }: ButtonProps) {
   const baseClass =
-    "inline-flex h-14 w-full items-center justify-center rounded-full px-6 font-medium transition-all duration-200 hover:scale-[1.02] disabled:opacity-40 sm:w-auto sm:max-w-none";
+    "inline-flex h-14 w-full items-center justify-center rounded-full px-6 font-medium transition-all duration-200 hover:scale-[1.02] disabled:opacity-40";
   const disabledClass = disabled ? " opacity-40 pointer-events-none" : "";
   const variantClass =
     variant === "primary"

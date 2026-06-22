@@ -3,17 +3,57 @@ import countdownBears from "../../assets/illustrations/bears-countdown-easter-eg
 import { wedding } from "../../data/wedding";
 import { playWatchTickLoop } from "../../lib/sounds";
 
+function getTimeZoneOffset(date: Date, timeZone: string) {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hourCycle: "h23",
+  }).formatToParts(date);
+
+  const values = Object.fromEntries(
+    parts
+      .filter((part) => part.type !== "literal")
+      .map((part) => [part.type, Number(part.value)]),
+  );
+  const zonedTime = Date.UTC(
+    values.year,
+    values.month - 1,
+    values.day,
+    values.hour,
+    values.minute,
+    values.second,
+  );
+
+  return zonedTime - date.getTime();
+}
+
+function getZonedDateTime(dateValue: string, timeValue: string, timeZone: string) {
+  const [year, month, day] = dateValue.split("-").map(Number);
+  const [hour = 0, minute = 0] = timeValue.split(":").map(Number);
+  const utcTime = Date.UTC(year, month - 1, day, hour, minute);
+  const offset = getTimeZoneOffset(new Date(utcTime), timeZone);
+
+  return utcTime - offset;
+}
+
 function getCountdown() {
-  const target = new Date(
-    `${wedding.ceremony.date} ${wedding.ceremony.time || "00:00"}`,
-  ).getTime();
-  const remaining = Math.max(target - Date.now(), 0);
-  const totalMinutes = Math.floor(remaining / 1000 / 60);
+  const target = getZonedDateTime(
+    wedding.ceremony.date,
+    wedding.ceremony.time || "00:00",
+    wedding.ceremony.timeZone,
+  );
+  const remaining = target - Date.now();
+  const totalMinutes = Math.max(Math.ceil(remaining / 1000 / 60), 0);
   const days = Math.floor(totalMinutes / 60 / 24);
   const hours = Math.floor((totalMinutes / 60) % 24);
   const minutes = totalMinutes % 60;
 
-  return { days, hours, minutes };
+  return { days, hours, minutes, isComplete: remaining <= 0 };
 }
 
 function wait(duration: number) {
@@ -29,7 +69,9 @@ export default function Countdown() {
   const isSecretRunning = useRef(false);
   const stopTicking = useRef<(() => void) | undefined>(undefined);
   const [time, setTime] = useState(() =>
-    hasDate ? getCountdown() : { days: 0, hours: 0, minutes: 0 },
+    hasDate
+      ? getCountdown()
+      : { days: 0, hours: 0, minutes: 0, isComplete: false },
   );
   const [showSecret, setShowSecret] = useState(false);
   const [isSecretExiting, setIsSecretExiting] = useState(false);
@@ -41,7 +83,7 @@ export default function Countdown() {
 
     const timer = window.setInterval(() => {
       setTime(getCountdown());
-    }, 60000);
+    }, 1000);
 
     return () => window.clearInterval(timer);
   }, [hasDate]);
@@ -79,7 +121,7 @@ export default function Countdown() {
   };
 
   return (
-    <section className="px-6 py-20">
+    <section className="px-6 pb-20 pt-16">
       <style>
         {`
           @keyframes countdown-secret-enter {
@@ -154,7 +196,11 @@ export default function Countdown() {
         </p>
 
         <div className="mt-12 rounded-3xl border border-stone-200 bg-white/70 px-6 py-10 shadow-[0_18px_50px_rgba(0,0,0,0.06)] backdrop-blur-xl">
-          {hasDate ? (
+          {hasDate && time.isComplete ? (
+            <p className="font-serif text-3xl font-medium leading-tight text-black">
+              Today is our wedding day ❤️
+            </p>
+          ) : hasDate ? (
             <div className="grid grid-cols-3 gap-3">
               <div>
                 <p className="text-3xl font-light text-black">{time.days}</p>

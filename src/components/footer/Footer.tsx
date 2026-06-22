@@ -96,7 +96,7 @@ export default function Footer() {
   };
 
   return (
-    <footer className="px-6 py-20 text-center text-stone-500">
+    <footer className="px-6 pb-20 pt-10 text-center text-stone-500">
       <style>
         {`
           @keyframes pride-heart {

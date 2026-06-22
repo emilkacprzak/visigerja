@@ -1,6 +1,11 @@
 import { useRef, useState } from "react";
-import { CalendarDays, MapPinned } from "lucide-react";
+import { MapPinned } from "lucide-react";
+import googleGLogo from "../../assets/google-g-logo.svg";
 import ceremonyBears from "../../assets/illustrations/bears-ceremony-easter-egg.webp";
+import {
+  getAppleCalendarUrl,
+  weddingEvent,
+} from "../../lib/eventLinks";
 import { playCeremonyMusicBox } from "../../lib/sounds";
 import Button from "../Shared/Button";
 import Section from "../Shared/Section";
@@ -137,22 +142,51 @@ export default function Ceremony() {
         </div>
 
         <div className="mt-10 flex w-full flex-col gap-4">
-          <Button variant="primary">
+          <Button
+            href={weddingEvent.mapsUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            variant="primary"
+          >
             <span className="inline-flex items-center gap-2">
-              <MapPinned className="text-stone-700" size={26} strokeWidth={1.75} />
+              <MapPinned className="text-white" size={26} strokeWidth={1.75} />
               Open in Google Maps
             </span>
           </Button>
-          <Button variant="secondary">
-            <span className="inline-flex items-center gap-2">
-              <CalendarDays
-                className="text-stone-700"
-                size={26}
-                strokeWidth={1.75}
-              />
-              Add to Calendar
-            </span>
-          </Button>
+          <div className="grid w-full grid-cols-1 gap-4 self-center sm:w-[min(calc(100vw-3rem),520px)] sm:grid-cols-2">
+            <Button
+              href={getAppleCalendarUrl()}
+              rel="noopener noreferrer"
+              variant="secondary"
+            >
+              <span className="inline-flex items-center gap-2">
+                <span
+                  className="text-3xl leading-none text-stone-900"
+                  aria-hidden="true"
+                >
+                  
+                </span>
+                <span>Calendar</span>
+              </span>
+            </Button>
+            <Button
+              href={weddingEvent.googleCalendarUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              variant="secondary"
+            >
+              <span className="inline-flex items-center gap-2">
+                <img
+                  src={googleGLogo}
+                  alt=""
+                  className="h-7 w-7"
+                  draggable={false}
+                  aria-hidden="true"
+                />
+                <span>Calendar</span>
+              </span>
+            </Button>
+          </div>
         </div>
       </div>
       {showSecret && (

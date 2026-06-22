@@ -17,7 +17,7 @@ const cards = [
   },
   {
     icon: <Hotel className="text-stone-700" size={26} strokeWidth={1.75} />,
-    title: "Hotels",
+    title: "Accommodation",
     text: "Find accommodation in Copenhagen.",
     button: "Search on Booking.com",
     href: "https://www.booking.com/searchresults.html?ss=Copenhagen",
@@ -399,8 +399,8 @@ export default function Travel() {
         </div>
       )}
 
-      <Section>
-        <div className="mx-auto flex w-full max-w-[340px] flex-col items-center py-20 text-center">
+      <Section id="travel">
+        <div className="mx-auto flex w-full max-w-[340px] flex-col items-center pb-20 pt-16 text-center">
           <h2
             className="font-serif text-5xl font-medium leading-none tracking-tight text-black"
             onClick={handleTravelTitleTap}
@@ -412,9 +412,10 @@ export default function Travel() {
             {cards.map((card) => (
               <article
                 key={card.title}
+                id={card.title === "Accommodation" ? "accommodation" : undefined}
                 className="relative rounded-3xl border border-stone-200 bg-white/70 p-6 text-center shadow-[0_18px_50px_rgba(0,0,0,0.06)] backdrop-blur-xl"
               >
-                {card.title === "Hotels" && showHotelSleep && (
+                {card.title === "Accommodation" && showHotelSleep && (
                   <div
                     className={`pointer-events-none absolute inset-0 z-20 flex items-center justify-center transition-opacity duration-400 ${
                       isHotelSleepLeaving ? "opacity-0" : "opacity-100"
@@ -437,7 +438,7 @@ export default function Travel() {
                   onClick={
                     card.title === "Flights"
                       ? handleTitleTap
-                      : card.title === "Hotels"
+                      : card.title === "Accommodation"
                         ? handleHotelTitleTap
                         : undefined
                   }
