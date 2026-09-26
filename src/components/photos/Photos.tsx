@@ -194,9 +194,9 @@ export default function Photos() {
           </h2>
 
           <p className="mt-5 text-base font-light leading-7 text-stone-500">
-            After the wedding you'll find our official gallery here. We'd love
-            to see your photos too. Please upload them as soon as possible after
-            the wedding. Thank you! 🤍
+            We'd love to see our wedding through your eyes. Share your photos
+            and videos with us — no Dropbox account needed. Our official gallery
+            will be available after the wedding. Thank you! 🤍
           </p>
 
           <div className="mt-8 flex w-full flex-col gap-4">
@@ -209,19 +209,30 @@ export default function Photos() {
             >
               View gallery
             </Button>
-            <Button
-              variant="secondary"
-              href={uploadUrl}
-              disabled={!uploadUrl}
-              target="_blank"
-              rel="noopener noreferrer"
+            <div
+              className={uploadUrl
+                ? "relative mt-3 rounded-full shadow-[0_0_20px_rgba(190,151,72,0.16)] [&>a]:border-[#b99a52] [&>a]:bg-[#fffaf0] [&>a]:hover:bg-[#fff4dc] [&>a]:focus-visible:outline-2 [&>a]:focus-visible:outline-offset-4 [&>a]:focus-visible:outline-[#8b6825]"
+                : undefined}
             >
-              Upload photos
-            </Button>
+              {uploadUrl && (
+                <span className="pointer-events-none absolute -top-2.5 left-1/2 z-10 -translate-x-1/2 whitespace-nowrap rounded-full border border-[#c5a660] bg-[#f9edcf] px-3 py-1 text-[10px] font-semibold leading-none tracking-[0.16em] text-[#75551e]">
+                  NOW OPEN
+                </span>
+              )}
+              <Button
+                variant="secondary"
+                href={uploadUrl}
+                disabled={!uploadUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Upload photos
+              </Button>
+            </div>
           </div>
 
           <p className="mx-auto mt-6 inline-flex rounded-full border border-stone-200 bg-white/70 px-4 py-2 text-xs font-medium text-stone-500">
-            Available after the wedding
+            {galleryUrl ? "Our wedding memories 🤍" : "Gallery available after the wedding"}
           </p>
         </article>
       </div>

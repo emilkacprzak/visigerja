@@ -18,8 +18,8 @@ export const wedding = {
 
   photos: {
     galleryUrl: "",
-    uploadUrl: "",
-    isEnabled: false,
+    uploadUrl: "https://www.dropbox.com/request/5g2bz9j92hikyumeuvcx",
+    isEnabled: true,
   },
 
   links: {
