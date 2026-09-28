@@ -381,10 +381,10 @@ export default function Travel() {
 
           @keyframes hotel-sleep-float {
             0%, 100% {
-              transform: translate(-50%, -50%) translateY(0px) scale(0.99);
+              transform: translateY(0px) scale(0.99);
             }
             50% {
-              transform: translate(-50%, -50%) translateY(-2px) scale(1);
+              transform: translateY(-2px) scale(1);
             }
           }
 
