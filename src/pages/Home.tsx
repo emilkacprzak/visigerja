@@ -1,4 +1,5 @@
 import Countdown from "../components/countdown/Countdown";
+import Livestream from "../components/Livestream";
 import Footer from "../components/footer/Footer";
 import Hero from "../components/Hero/Hero";
 import Navigation from "../components/navigation/Navigation";
@@ -13,6 +14,7 @@ export default function Home() {
       <Hero />
       <Countdown />
       <WeddingCeremony />
+      <Livestream />
       <Travel />
       <Photos />
       <Footer />

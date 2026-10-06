@@ -3,6 +3,7 @@ import { useEffect, useState, type MouseEvent } from "react";
 const navItems = [
   { label: "Love", href: "#home" },
   { label: "Wedding", href: "#wedding" },
+  { label: "Live", href: "#live" },
   { label: "Travel", href: "#travel" },
   { label: "Accommodation", href: "#accommodation" },
   { label: "Gallery", href: "#gallery" },

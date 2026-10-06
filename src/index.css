@@ -20,3 +20,104 @@ body {
   color: var(--foreground);
   font-family: "Inter", sans-serif;
 }
+
+.wedding-notice {
+  position: fixed;
+  left: 50%;
+  top: 6rem;
+  z-index: 50;
+  width: min(440px, calc(100vw - 2rem));
+  transform: translateX(-50%);
+  padding: 22px 26px 18px;
+  border: 1px solid #c9ad79;
+  border-radius: 12px;
+  background: radial-gradient(ellipse at top left, #fffaf0, transparent 65%), #fffdf8;
+  box-shadow: 0 20px 65px #48371f24, 0 3px 14px #48371f0c;
+  transition: opacity 300ms ease;
+}
+
+.wedding-notice::before {
+  content: "";
+  position: absolute;
+  inset: 7px;
+  border: 1px solid #d8c5a0;
+  border-radius: 6px;
+  pointer-events: none;
+}
+
+.wedding-notice-signature {
+  display: block;
+  text-align: center;
+  font-family: "Great Vibes", cursive;
+  font-size: 32px;
+  color: #987445;
+}
+
+.wedding-notice-content {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin: 4px 0 8px;
+}
+
+.wedding-notice-bear-column { flex-shrink: 0; text-align: center; }
+.wedding-notice-time {
+  margin: -14px 0 0;
+  font-family: "Cormorant Garamond", serif;
+  font-size: 48px;
+  font-weight: 600;
+  line-height: 1;
+  color: #987445;
+}
+.wedding-notice-bear {
+  width: 112px;
+  height: 208px;
+  flex-shrink: 0;
+  object-fit: contain;
+  filter: drop-shadow(0 7px 6px #654f2520);
+}
+
+.wedding-notice-copy { flex: 1; text-align: center; }
+.wedding-notice-ornament { display: block; color: #b08d57; font-size: 22px; margin-bottom: 6px; }
+.wedding-notice-title {
+  margin: 0;
+  font-family: "Cormorant Garamond", serif;
+  font-size: 32px;
+  font-weight: 600;
+  line-height: 1.05;
+  color: #3c3026;
+}
+.wedding-notice-divider {
+  display: block;
+  width: 64px;
+  height: 1px;
+  margin: 14px auto 10px;
+  background: linear-gradient(to right, transparent, #b08d57, transparent);
+}
+.wedding-notice-translation {
+  margin: 0;
+  font-family: "Cormorant Garamond", serif;
+  font-size: 18px;
+  font-style: italic;
+  line-height: 1.25;
+  color: #7e6b56;
+}
+.wedding-notice-date {
+  display: block;
+  text-align: center;
+  font-size: 10px;
+  letter-spacing: 0.3em;
+  color: #987445;
+}
+@media (max-width: 420px) {
+  .wedding-notice { padding: 20px 22px 18px; }
+  .wedding-notice-content { gap: 12px; }
+  .wedding-notice-bear { width: 92px; height: 184px; }
+  .wedding-notice-title { font-size: 28px; }
+  .wedding-notice-translation { font-size: 17px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .live-notice { transition: none; }
+}
