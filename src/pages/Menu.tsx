@@ -1,5 +1,6 @@
 import { ArrowLeft, Utensils } from "lucide-react";
 import Section from "../components/Shared/Section";
+import PronunciationButton from "../components/PronunciationButton";
 
 const sections = [
   {
@@ -100,7 +101,10 @@ export default function Menu() {
         </a>
         <header className="pb-10 pt-12 text-center">
           <Utensils className="mx-auto text-[#b08d57]" size={28} strokeWidth={1.4} aria-hidden="true" />
-          <p className="mt-5 text-xs font-medium uppercase tracking-[0.25em] text-[#987445]">Københavner Caféen</p>
+          <div className="mt-5 flex items-center justify-center gap-2">
+            <p className="text-xs font-medium uppercase tracking-[0.25em] text-[#987445]">Københavner Caféen</p>
+            <PronunciationButton />
+          </div>
           <h1 className="mt-4 font-serif text-6xl font-medium text-black sm:text-7xl">The Menu</h1>
           <p className="mt-4 text-sm text-stone-500">Our Wedding Day Lunch</p>
         </header>

@@ -2,6 +2,7 @@ import { MapPinned, Utensils } from "lucide-react";
 import { wedding } from "../data/wedding";
 import Button from "./Shared/Button";
 import Section from "./Shared/Section";
+import PronunciationButton from "./PronunciationButton";
 
 export default function WeddingLunch() {
   return (
@@ -20,7 +21,10 @@ export default function WeddingLunch() {
           <div className="mt-8 border-y border-[#b08d57]/20 py-7">
             <p className="text-xs font-medium uppercase tracking-[0.28em] text-stone-500">17 October 2026 · Lunch</p>
             <p className="mt-3 font-serif text-5xl font-medium text-[#987445]">{wedding.lunch.time}</p>
-            <h3 className="mt-5 font-serif text-3xl font-medium text-black">{wedding.lunch.venue}</h3>
+            <div className="mt-5 flex flex-wrap items-center justify-center gap-2">
+              <h3 className="font-serif text-3xl font-medium text-black">{wedding.lunch.venue}</h3>
+              <PronunciationButton />
+            </div>
             <p className="mt-2 text-base font-light leading-relaxed text-stone-600">{wedding.lunch.address}</p>
           </div>
           <div className="mx-auto mt-7 flex max-w-[340px] flex-col gap-3">
