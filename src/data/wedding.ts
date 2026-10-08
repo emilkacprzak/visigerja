@@ -16,6 +16,13 @@ export const wedding = {
       "https://www.google.com/maps/search/?api=1&query=Copenhagen%20City%20Hall%2C%20R%C3%A5dhuspladsen%201%2C%201550%20K%C3%B8benhavn%20V%2C%20Denmark",
   },
 
+  lunch: {
+    time: "11:30",
+    venue: "Københavner Caféen",
+    address: "Badstuestræde 10, 1209 Copenhagen, Denmark",
+    mapsUrl: "https://www.google.com/maps/search/?api=1&query=K%C3%B8benhavner%20Caf%C3%A9en%2C%20Badstuestr%C3%A6de%2010%2C%201209%20Copenhagen%2C%20Denmark",
+  },
+
   photos: {
     galleryUrl: "",
     uploadUrl: "https://www.dropbox.com/request/5g2bz9j92hikyumeuvcx",
