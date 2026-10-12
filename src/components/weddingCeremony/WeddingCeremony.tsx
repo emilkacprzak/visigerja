@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { MapPinned } from "lucide-react";
+import { MapPinned, Plus } from "lucide-react";
 import googleGLogo from "../../assets/google-g-logo.svg";
 import ceremonyBears from "../../assets/illustrations/wedding-bears-copenhagen.webp";
 import { wedding } from "../../data/wedding";
@@ -31,6 +31,21 @@ const ceremonyCards = [
   {
     label: "Location",
     value: wedding.ceremony.address,
+  },
+];
+
+const ceremonyQuestions = [
+  {
+    question: "When should we arrive at City Hall?",
+    answer: "Please arrive 10–15 minutes before our ceremony at 10:00 a.m., so aim to be at City Hall between 9:45 and 9:50 a.m.",
+  },
+  {
+    question: "How do we find the Wedding Hall?",
+    answer: "From the main entrance, follow the hearts on the floor through the Great Hall to the waiting area. There is no need to announce your arrival — simply wait there with the other guests. When it is our turn, we will be escorted to the Wedding Hall on the first floor. Small delays may occur.",
+  },
+  {
+    question: "What language will the ceremony be conducted in?",
+    answer: "Our wedding ceremony will be conducted in English.",
   },
 ];
 
@@ -255,6 +270,25 @@ export default function WeddingCeremony() {
                 <span>Calendar</span>
               </span>
             </Button>
+          </div>
+        </div>
+
+        <div className="mx-auto mt-14 max-w-3xl text-left">
+          <p className="mb-5 text-center text-xs font-medium uppercase tracking-[0.28em] text-stone-400">
+            A few helpful details
+          </p>
+          <div className="overflow-hidden rounded-3xl border border-stone-200 bg-white/70 backdrop-blur-xl">
+            {ceremonyQuestions.map(({ question, answer }) => (
+              <details key={question} className="group border-b border-stone-200 last:border-b-0">
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-5 px-6 py-6 text-lg font-medium text-stone-900 transition-colors hover:bg-stone-100/60 focus-visible:outline-2 focus-visible:outline-offset-[-4px] focus-visible:outline-stone-500 [&::-webkit-details-marker]:hidden sm:px-8">
+                  <span>{question}</span>
+                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-stone-200 bg-white text-stone-600">
+                    <Plus size={17} strokeWidth={1.5} className="transition-transform duration-200 group-open:rotate-45" aria-hidden="true" />
+                  </span>
+                </summary>
+                <p className="px-6 pb-6 pr-12 text-base leading-relaxed text-stone-600 sm:px-8 sm:pr-16">{answer}</p>
+              </details>
+            ))}
           </div>
         </div>
       </div>

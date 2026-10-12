@@ -80,7 +80,7 @@ export default function Countdown() {
   const [isSecretExiting, setIsSecretExiting] = useState(false);
 
   useEffect(() => {
-    if (!hasDate) {
+    if (!hasDate || time.isComplete) {
       return;
     }
 
@@ -89,7 +89,7 @@ export default function Countdown() {
     }, 1000);
 
     return () => window.clearInterval(timer);
-  }, [hasDate]);
+  }, [hasDate, time.isComplete]);
 
   const resetCountdownSecret = () => {
     timers.current.forEach((timer) => window.clearTimeout(timer));
@@ -116,6 +116,16 @@ export default function Countdown() {
       }
     };
   }, []);
+
+  useEffect(() => {
+    if (time.isComplete) {
+      stopEasterEgg(COUNTDOWN_EASTER_EGG_ID);
+      if (audioRef.current) {
+        audioRef.current.onended = null;
+        stopAudio(audioRef.current);
+      }
+    }
+  }, [time.isComplete]);
 
   const runCountdownSecret = () => {
     startEasterEgg(COUNTDOWN_EASTER_EGG_ID, () => {
@@ -167,6 +177,10 @@ export default function Countdown() {
       }, 400),
     );
   };
+
+  if (hasDate && time.isComplete) {
+    return null;
+  }
 
   return (
     <section className="px-6 pb-20 pt-16" onClick={handleSectionClick}>
@@ -241,11 +255,7 @@ export default function Countdown() {
         </p>
 
         <div className="mt-12 rounded-3xl border border-stone-200 bg-white/70 px-6 py-10 shadow-[0_18px_50px_rgba(0,0,0,0.06)] backdrop-blur-xl">
-          {hasDate && time.isComplete ? (
-            <p className="font-serif text-3xl font-medium leading-tight text-black">
-              Today is our wedding day ❤️
-            </p>
-          ) : hasDate ? (
+          {hasDate ? (
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
               <div>
                 <p className="text-3xl font-light text-black">{time.days}</p>
