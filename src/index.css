@@ -121,3 +121,33 @@ body {
   html { scroll-behavior: auto; }
   .live-notice { transition: none; }
 }
+
+.wedding-confetti {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 100;
+}
+.wedding-confetti > span {
+  position: absolute;
+  top: -24px;
+  animation: wedding-confetti-fall 3.4s ease-in forwards;
+  opacity: 0;
+}
+.wedding-confetti-piece {
+  width: 6px;
+  height: 10px;
+  border-radius: 1px;
+  box-shadow: 0 0 1px #b08d5733;
+}
+.wedding-confetti-heart { font-size: 13px; }
+@keyframes wedding-confetti-fall {
+  0% { opacity: 0; transform: translate3d(0, -12px, 0) rotate(0); }
+  12% { opacity: .8; }
+  75% { opacity: .65; }
+  100% { opacity: 0; transform: translate3d(var(--drift), 105vh, 0) rotate(var(--turn)); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .wedding-confetti { display: none; }
+}
