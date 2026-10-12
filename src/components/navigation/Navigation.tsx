@@ -14,6 +14,16 @@ function isHTMLElement(element: HTMLElement | null): element is HTMLElement {
 }
 
 export default function Navigation() {
+  const liveEnd = Date.parse("2026-10-17T11:00:00+02:00");
+  const [liveEnded, setLiveEnded] = useState(() => Date.now() >= liveEnd);
+  useEffect(() => {
+    if (liveEnded) return;
+    const timer = window.setInterval(() => {
+      if (Date.now() >= liveEnd) setLiveEnded(true);
+    }, 1000);
+    return () => window.clearInterval(timer);
+  }, [liveEnded, liveEnd]);
+
   const [activeId, setActiveId] = useState("home");
 
   useEffect(() => {
@@ -76,7 +86,7 @@ export default function Navigation() {
       aria-label="Main navigation"
     >
       <ul className="flex w-full scroll-px-2 items-center justify-start gap-1 overflow-x-auto px-0.5 [scrollbar-width:none] sm:w-auto sm:justify-center [&::-webkit-scrollbar]:hidden">
-        {navItems.map((item) => {
+        {navItems.filter((item) => !liveEnded || item.href !== "#live").map((item) => {
           const id = item.href.slice(1);
           const isActive = activeId === id;
 
