@@ -5,14 +5,21 @@ import noticeBear from "../assets/illustrations/navy-bear-cutout.png";
 import Section from "./Shared/Section";
 import { wedding } from "../data/wedding";
 
+const NOTICE_END = Date.parse("2026-10-17T11:00:00+02:00");
+
 const liveUrl = "https://www.youtube.com/live/Wm3fKmv12kc";
 
 export default function Livestream() {
-  const [showNotice, setShowNotice] = useState(true);
+  const [showNotice, setShowNotice] = useState(() => Date.now() < NOTICE_END);
 
   useEffect(() => {
-    const hideTimer = window.setTimeout(() => setShowNotice(false), 5000);
+    const remaining = NOTICE_END - Date.now();
+    if (remaining <= 0) return;
+    const hideTimer = window.setTimeout(
+      () => setShowNotice(false), Math.min(5000, remaining),
+    );
     const scrollTimer = window.setTimeout(() => {
+      if (Date.now() >= NOTICE_END) return;
       // Preserve direct links to other sections of the wedding page.
       if (window.location.hash && window.location.hash !== "#live") return;
       document.getElementById("live")?.scrollIntoView({
@@ -28,7 +35,7 @@ export default function Livestream() {
 
   return (
     <>
-      <div
+      {showNotice && <div
         role="status"
         aria-live="polite"
         className={`live-notice wedding-notice ${showNotice ? "opacity-100" : "pointer-events-none opacity-0"}`}
@@ -47,7 +54,7 @@ export default function Livestream() {
           </div>
         </div>
         <span aria-hidden="true" className="wedding-notice-date">17 · 10 · 2026</span>
-      </div>
+      </div>}
       <Section id="live" className="pb-16 pt-8 text-center">
         <div className="mx-auto max-w-3xl">
           <p className="text-xs font-medium uppercase tracking-[0.28em] text-[#b08d57]">Emil &amp; Karol · 17 October 2026</p>
