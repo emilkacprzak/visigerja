@@ -10,6 +10,7 @@ const NOTICE_END = Date.parse("2026-10-17T11:00:00+02:00");
 const liveUrl = "https://www.youtube.com/live/Wm3fKmv12kc";
 
 export default function Livestream() {
+  const [isExpired, setIsExpired] = useState(() => Date.now() >= NOTICE_END);
   const [showNotice, setShowNotice] = useState(() => Date.now() < NOTICE_END);
 
   useEffect(() => {
@@ -32,6 +33,22 @@ export default function Livestream() {
       window.clearTimeout(scrollTimer);
     };
   }, []);
+
+  useEffect(() => {
+    const checkExpiry = () => {
+      if (Date.now() >= NOTICE_END) setIsExpired(true);
+    };
+    checkExpiry();
+    if (isExpired) return;
+    const timer = window.setInterval(checkExpiry, 1000);
+    document.addEventListener("visibilitychange", checkExpiry);
+    return () => {
+      window.clearInterval(timer);
+      document.removeEventListener("visibilitychange", checkExpiry);
+    };
+  }, [isExpired]);
+
+  if (isExpired) return null;
 
   return (
     <>
