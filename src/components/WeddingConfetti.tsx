@@ -1,7 +1,7 @@
 import { useEffect, useState, type CSSProperties } from "react";
 
-const START = Date.parse("2026-10-16T10:00:00+02:00");
-const END = Date.parse("2026-10-19T00:00:00+02:00");
+const START = Date.parse("2026-10-12T16:13:21Z");
+const END = Date.parse("2026-10-19T16:13:21Z");
 const particles = Array.from({ length: 44 }, (_, index) => ({
   left: `${(index * 37 + 11) % 100}%`,
   delay: `${(index % 8) * 0.07}s`,
