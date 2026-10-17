@@ -207,7 +207,7 @@ export default function WeddingCeremony() {
           ))}
         </div>
 
-        <section className="mx-auto mt-16 max-w-4xl rounded-3xl border border-stone-200 bg-white/70 px-6 py-12 sm:px-12 sm:py-16" aria-labelledby="thank-you-heading">
+        <section id="thanks" className="mx-auto mt-16 scroll-mt-24 max-w-4xl rounded-3xl border border-stone-200 bg-white/70 px-6 py-12 sm:px-12 sm:py-16" aria-labelledby="thank-you-heading">
           <div lang="en">
             <h3 id="thank-you-heading" className="font-serif text-4xl font-medium leading-tight text-stone-900 sm:text-5xl">Thank you for being part of our day</h3>
             <p className="mx-auto mt-7 max-w-2xl text-lg leading-relaxed text-stone-600">To everyone who celebrated with us in Copenhagen, and everyone who joined us online to watch us say “I do” — thank you from the bottom of our hearts.</p>
