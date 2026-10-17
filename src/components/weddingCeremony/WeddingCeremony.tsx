@@ -1,6 +1,4 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { MapPinned, Plus } from "lucide-react";
-import googleGLogo from "../../assets/google-g-logo.svg";
 import ceremonyBears from "../../assets/illustrations/wedding-bears-copenhagen.webp";
 import { wedding } from "../../data/wedding";
 import {
@@ -10,7 +8,6 @@ import {
   stopAudio,
   stopEasterEgg,
 } from "../../lib/easterEggs";
-import { getAppleCalendarUrl, weddingEvent } from "../../lib/eventLinks";
 import Button from "../Shared/Button";
 import EasterEggOverlay from "../Shared/EasterEggOverlay";
 import Section from "../Shared/Section";
@@ -31,21 +28,6 @@ const ceremonyCards = [
   {
     label: "Location",
     value: wedding.ceremony.address,
-  },
-];
-
-const ceremonyQuestions = [
-  {
-    question: "When should we arrive at City Hall?",
-    answer: "Please arrive 10–15 minutes before our ceremony at 10:00 a.m., so aim to be at City Hall between 9:45 and 9:50 a.m.",
-  },
-  {
-    question: "How do we find the Wedding Hall?",
-    answer: "From the main entrance, follow the hearts on the floor through the Great Hall to the waiting area. There is no need to announce your arrival — simply wait there with the other guests. When it is our turn, we will be escorted to the Wedding Hall on the first floor. Small delays may occur.",
-  },
-  {
-    question: "What language will the ceremony be conducted in?",
-    answer: "Our wedding ceremony will be conducted in English.",
   },
 ];
 
@@ -225,72 +207,16 @@ export default function WeddingCeremony() {
           ))}
         </div>
 
-        <div className="mx-auto mt-10 flex w-full max-w-[340px] flex-col gap-4">
-          <Button
-            href={weddingEvent.mapsUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            variant="primary"
-          >
-            <span className="inline-flex items-center gap-2">
-              <MapPinned className="text-white" size={26} strokeWidth={1.75} />
-              Open in Google Maps
-            </span>
-          </Button>
-          <div className="grid w-full grid-cols-1 gap-4 self-center sm:w-[min(calc(100vw-3rem),520px)] sm:grid-cols-2">
-            <Button
-              href={getAppleCalendarUrl()}
-              rel="noopener noreferrer"
-              variant="secondary"
-            >
-              <span className="inline-flex items-center gap-2">
-                <span
-                  className="text-3xl leading-none text-stone-900"
-                  aria-hidden="true"
-                >
-                  
-                </span>
-                <span>Calendar</span>
-              </span>
-            </Button>
-            <Button
-              href={weddingEvent.googleCalendarUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              variant="secondary"
-            >
-              <span className="inline-flex items-center gap-2">
-                <img
-                  src={googleGLogo}
-                  alt=""
-                  className="h-7 w-7"
-                  draggable={false}
-                  aria-hidden="true"
-                />
-                <span>Calendar</span>
-              </span>
-            </Button>
+        <aside className="mx-auto mt-12 max-w-4xl rounded-3xl border border-[#c5a660] bg-[#fffaf0] px-6 py-10 shadow-[0_18px_50px_rgba(185,154,82,0.12)] sm:px-12 sm:py-14" aria-labelledby="photo-request-heading">
+          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#75551e]">A little request from the newlyweds</p>
+          <h3 id="photo-request-heading" className="mt-5 font-serif text-4xl font-medium leading-tight text-stone-900 sm:text-5xl">Please share your wedding photos!</h3>
+          <p className="mx-auto mt-6 max-w-2xl text-xl leading-relaxed text-stone-700 sm:text-2xl">Dear guests, we’d love to relive our special day through your eyes. Please upload your photos and videos as soon as you can using the link below — every moment means so much to us.</p>
+          <p className="mt-5 text-lg text-stone-600">With love and thanks, Emil &amp; Karol 🤍</p>
+          <div className="mx-auto mt-8 max-w-sm">
+            <Button href={wedding.photos.uploadUrl} target="_blank" rel="noopener noreferrer" variant="primary">Upload your photos &amp; videos</Button>
           </div>
-        </div>
-
-        <div className="mx-auto mt-14 max-w-3xl text-left">
-          <p className="mb-5 text-center text-xs font-medium uppercase tracking-[0.28em] text-stone-400">
-            A few helpful details
-          </p>
-          <div className="overflow-hidden rounded-3xl border border-stone-200 bg-white/70 backdrop-blur-xl">
-            {ceremonyQuestions.map(({ question, answer }) => (
-              <details key={question} className="group border-b border-stone-200 last:border-b-0">
-                <summary className="flex cursor-pointer list-none items-center justify-between gap-5 px-6 py-6 text-lg font-medium text-stone-900 transition-colors hover:bg-stone-100/60 focus-visible:outline-2 focus-visible:outline-offset-[-4px] focus-visible:outline-stone-500 [&::-webkit-details-marker]:hidden sm:px-8">
-                  <span>{question}</span>
-                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-stone-200 bg-white text-stone-600">
-                    <Plus size={17} strokeWidth={1.5} className="transition-transform duration-200 group-open:rotate-45" aria-hidden="true" />
-                  </span>
-                </summary>
-                <p className="px-6 pb-6 pr-12 text-base leading-relaxed text-stone-600 sm:px-8 sm:pr-16">{answer}</p>
-              </details>
-            ))}
-          </div>
-        </div>
+          <p className="mt-4 text-sm text-stone-500">No Dropbox account needed.</p>
+        </aside>
       </div>
       {showSecret && (
         <EasterEggOverlay
