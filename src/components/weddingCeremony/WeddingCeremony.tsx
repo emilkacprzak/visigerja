@@ -207,6 +207,25 @@ export default function WeddingCeremony() {
           ))}
         </div>
 
+        <section className="mx-auto mt-16 max-w-4xl rounded-3xl border border-stone-200 bg-white/70 px-6 py-12 sm:px-12 sm:py-16" aria-labelledby="thank-you-heading">
+          <div lang="en">
+            <h3 id="thank-you-heading" className="font-serif text-4xl font-medium leading-tight text-stone-900 sm:text-5xl">Thank you for being part of our day</h3>
+            <p className="mx-auto mt-7 max-w-2xl text-lg leading-relaxed text-stone-600">To everyone who celebrated with us in Copenhagen, and everyone who joined us online to watch us say “I do” — thank you from the bottom of our hearts.</p>
+            <p className="mx-auto mt-5 max-w-2xl text-lg leading-relaxed text-stone-600">Whether you were beside us at City Hall or cheering us on from afar, your love and presence made our wedding day even more special. We’re so grateful to have shared this moment with you.</p>
+            <p className="mt-6 text-lg leading-relaxed text-stone-700">With all our love,<br />Emil &amp; Karol 🤍</p>
+          </div>
+          <div lang="pl" className="mt-10 border-t border-stone-200 pt-10">
+            <h3 className="font-serif text-4xl font-medium leading-tight text-stone-900 sm:text-5xl">Dziękujemy, że byliście z nami</h3>
+            <p className="mx-auto mt-7 max-w-2xl text-lg leading-relaxed text-stone-600">Wszystkim, którzy świętowali z nami w Kopenhadze, oraz tym, którzy oglądali transmisję i towarzyszyli nam online, gdy mówiliśmy sobie „tak” — dziękujemy z całego serca.</p>
+            <p className="mx-auto mt-5 max-w-2xl text-lg leading-relaxed text-stone-600">Niezależnie od tego, czy byliście obok nas w ratuszu, czy kibicowaliście nam z daleka, Wasza miłość i obecność sprawiły, że nasz ślub był jeszcze piękniejszy. Jesteśmy ogromnie wdzięczni, że mogliśmy dzielić z Wami tę chwilę.</p>
+            <p className="mt-6 text-lg leading-relaxed text-stone-700">Z miłością,<br />Emil i Karol 🤍</p>
+          </div>
+          <a href="https://www.youtube.com/watch?v=Wm3fKmv12kc" target="_blank" rel="noopener noreferrer" className="mx-auto mt-10 flex min-h-24 w-full max-w-lg items-center justify-center gap-4 rounded-3xl border border-stone-200 bg-white px-5 py-6 shadow-[0_12px_35px_rgba(0,0,0,0.08)] transition-colors hover:border-red-300 hover:bg-red-50 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-red-600 sm:gap-6">
+            <svg viewBox="0 0 64 46" className="h-10 w-14 shrink-0 sm:h-12 sm:w-16" aria-hidden="true"><rect width="64" height="46" rx="12" fill="#FF0000" /><path d="M26 12 45 23 26 34Z" fill="white" /></svg>
+            <span className="text-left"><span lang="en" className="block text-xl font-semibold text-stone-900 sm:text-2xl">Watch our wedding</span><span lang="pl" className="mt-1 block text-base text-stone-600 sm:text-lg">Obejrzyj nasz ślub</span></span>
+          </a>
+        </section>
+
         <aside className="mx-auto mt-12 max-w-4xl rounded-3xl border border-[#c5a660] bg-[#fffaf0] px-6 py-10 shadow-[0_18px_50px_rgba(185,154,82,0.12)] sm:px-12 sm:py-14" aria-labelledby="photo-request-heading">
           <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#75551e]">A little request from the newlyweds</p>
           <h3 id="photo-request-heading" className="mt-5 font-serif text-4xl font-medium leading-tight text-stone-900 sm:text-5xl">Please share your wedding photos!</h3>
